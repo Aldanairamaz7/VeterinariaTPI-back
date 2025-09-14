@@ -30,5 +30,7 @@ export const Veterinarian = sequelize.define(
       allowNull: false,
     },
   },
-  { timestamps: false }
+  { timestamps: false,
+    tableName: 'veterinarians'
+  }
 );
