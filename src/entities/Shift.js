@@ -17,4 +17,34 @@ export const Shift = sequelize.define(
     type: DataTypes.TEXT,
     allowNull: true,
   },
-});
+  veterinarianId:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references:{
+      model: 'veterinarians',
+      key: 'id'
+    },
+  },
+  petId:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references:{
+      model: 'pets',
+      key:'id',
+    },
+  },
+  userId:{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    references:{
+      model: 'users',
+      key:'id',
+    },
+  },
+  
+},
+{
+    timestamps: false,
+    tableName: 'shifts'
+  },
+);
