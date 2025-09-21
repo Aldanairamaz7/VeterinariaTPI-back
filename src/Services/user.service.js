@@ -68,8 +68,33 @@ export const login = async (req,res) =>{
 
         const token = jwt.sign({email}, secretKey, {expiresIn: "1h"})
 
-        return res.json(token)
+        return res.json({
+            token,
+            user:{
+                id: user.id,
+                firstName: user.firstName,
+                email: user.email
+
+            }
+        })
 
     
 
+}
+
+export const authenticateToken = (req, res, next) =>{
+
+    const secretKey = 'TUP-VetCare'
+    const authHeader = req.headers['authorization'];
+
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(!token) return res.status(401).json({message: 'Token no proporcionado'})
+    
+    jwt.verify(token, secretKey, (err, userData) =>{
+        if(err) return res.status(403).json({message: 'Token invalido o expirado'})
+
+        req.user = userData
+        next()
+    })
 }

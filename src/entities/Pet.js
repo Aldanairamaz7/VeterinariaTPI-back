@@ -20,9 +20,9 @@ export const Pet = sequelize.define(
         type: DataTypes.STRING(50),
         allowNull: false,
       },
-      dateBirth: {
-        type: DataTypes.DATE,
-        allowNull: false,
+      imageURL: {
+        type: DataTypes.STRING(255),
+        allowNull: true,
       },
       userId: {
         type: DataTypes.INTEGER,
