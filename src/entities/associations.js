@@ -5,8 +5,8 @@ import { Pet } from './Pet.js';
 import { Shift } from './Shift.js';
 
 export const defineAssociations = () => {
- User.hasMany(Pet, { foreignKey: "userId", onDelete: "CASCADE" });
- Pet.belongsTo(User, { foreignKey: "userId" });
+ User.hasMany(Pet, { foreignKey: "userId", onDelete: "CASCADE", as:'pets' });
+ Pet.belongsTo(User, { foreignKey: "userId", as:'user'});
 
  Veterinarian.hasMany(Shift, { foreignKey: "veterinarianId", onDelete: "CASCADE" });
  Shift.belongsTo(Veterinarian, { foreignKey: "veterinarianId" });
