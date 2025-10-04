@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addPet, authenticateToken, login, register } from "../Services/user.service.js";
+import { addPet, authenticateToken, editProfile, login, register } from "../Services/user.service.js";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 
@@ -10,7 +10,7 @@ userRoutes.post('/login', login)
 userRoutes.get('/user/me', authenticateToken, async (req, res)=>{
     try{
         const user = await User.findByPk(req.user.id, {
-            attributes:['id', 'firstName', 'email'],
+            attributes:['id', 'firstName', 'lastName', 'dni', 'email'],
             include:[
                 {
                     model: Pet,
@@ -31,5 +31,9 @@ userRoutes.get('/user/me', authenticateToken, async (req, res)=>{
 })
 
 userRoutes.post('/addpet', authenticateToken, addPet)
+
+/* Hay que testear estos endpoints */
+
+userRoutes.put("/editprofile", authenticateToken, editProfile)
 
 export default userRoutes

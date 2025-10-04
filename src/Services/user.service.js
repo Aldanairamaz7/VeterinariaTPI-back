@@ -139,3 +139,59 @@ export const addPet = async (req, res) => {
 /* export const getPets = (req, res ,next) => {
 
 } */
+
+
+export const editProfile = async (req, res) => {
+    
+    try{
+        const { firstName, lastName, dni, email, password } = req.body;
+
+        const user = await User.findByPk(req.user.id, {
+            attributes: ["id", "firstName", "lastName", "dni", "email", "password"],
+            include:[
+                {
+                    model: Pet,
+                    as:'pets'
+                }
+            ]
+        });
+
+        if(!user){
+            return res.status(404).json({ message: "Usuario no encontrado"});
+        }
+
+        if(firstName)
+            user.firstName = firstName
+        if(lastName)
+            user.lastName = lastName
+        if(dni)
+            user.dni = dni
+        if(email)
+            user.email = email
+
+        const currentPasword = user.password
+
+        if(!password)
+            user.password = currentPasword
+
+        if(password){
+            const saltRounds = 10;
+            const salt = await bcrypt.genSalt(saltRounds)
+            user.password = await bcrypt.hash(password, salt)
+        }
+
+        await user.save();
+
+        const updatedUser =  user.toJSON();
+        delete updatedUser.password;
+
+
+        res.json({ 
+            message: "Perfil actualizado correctamente.", 
+            user: updatedUser
+        });
+    } catch(error){
+        console.error("Error en editProfile: ", error);
+        res.status(500).json({ message: "Error del servidor" });
+    }
+};
