@@ -62,7 +62,7 @@ export const login = async (req,res) =>{
         })
 
         if (!user)
-            return res.status(401).send({ message: "Usuario no existente"})
+            return res.status(401).send({ message: "Cuenta no registrada."})
 
         const comparison = await bcrypt.compare(password, user.password)
 
@@ -135,11 +135,6 @@ export const addPet = async (req, res) => {
     }
 
 }
-
-/* export const getPets = (req, res ,next) => {
-
-} */
-
 
 export const editProfile = async (req, res) => {
     
