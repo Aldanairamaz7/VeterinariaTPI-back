@@ -8,7 +8,15 @@ export const editPet = async (req, res) => {
     if (!id) {
       return res.status(400).json({ message: "ID de la mascota es requerido" });
     }
-    const user = await User.findByPk(req.user.id);
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "firstName", "lastName", "dni"],
+      include: [
+        {
+          model: Pet,
+          as: 'pets'
+        }
+      ]
+    });
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
@@ -35,7 +43,18 @@ export const editPet = async (req, res) => {
         },
       }
     );
-    return res.status(200).json({ user });
+
+    const updatedUser = await User.findByPk(req.user.id, {
+      attributes: ["id", "firstName", "lastName", "dni", "email"],
+      include: [
+        {
+          model: Pet,
+          as: "pets"
+        }
+      ]
+    })
+
+    return res.status(200).json({ message: "Mascota actualizada con exito.", user: updatedUser });
   } catch (error) {
     console.error("Error al modificar la mascota", error);
     res.status(500).json({ message: "Error interno del servidor" });
