@@ -6,4 +6,4 @@ const petRoutes = Router();
 
 petRoutes.put("/editPets", authenticateToken, editPet);
 
-export default petRoutes
+export default petRoutes;
