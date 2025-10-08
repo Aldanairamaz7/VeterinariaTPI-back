@@ -3,34 +3,34 @@ import { PORT } from "./config.js";
 import router from "./Routes/routes.js";
 import { sequelize } from "./db.js";
 
-import './entities/User.js';
-import './entities/Pet.js';
-import './entities/Shift.js';
-import './entities/Veterinarian.js';
+import "./entities/User.js";
+import "./entities/Pet.js";
+import "./entities/Shift.js";
+import "./entities/Veterinarian.js";
 
-import { defineAssociations } from './entities/associations.js'; // Ajusta la ruta según tu estructura
+import { defineAssociations } from "./entities/associations.js"; // Ajusta la ruta según tu estructura
 import userRoutes from "./Routes/user.routes.js";
 import petRoutes from "./Routes/pet.routes.js";
+import adminRoutes from "./Routes/admin.routes.js";
 
 defineAssociations();
 
-
 const app = express();
-
 
 async function startServer() {
   try {
-      app.use(express.json());
-      app.use((req, res, next) =>{
-        res.header("Access-Control-Allow-Origin", "*");
-		    res.header("Access-Control-Allow-Headers", "*");
-		    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
-        next();
-      })
+    app.use(express.json());
+    app.use((req, res, next) => {
+      res.header("Access-Control-Allow-Origin", "*");
+      res.header("Access-Control-Allow-Headers", "*");
+      res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+      next();
+    });
 
-      app.use(router);
-      app.use(userRoutes);
-      app.use(petRoutes);
+    app.use(router);
+    app.use(userRoutes);
+    app.use(petRoutes);
+    app.use(adminRoutes);
 
     await sequelize.sync();
 
@@ -44,4 +44,3 @@ async function startServer() {
 }
 
 startServer();
-
