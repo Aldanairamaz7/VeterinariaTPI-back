@@ -133,7 +133,15 @@ export const addPet = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
-    const { firstName, lastName, dni, email, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      dni,
+      email,
+      password,
+      isAdmin,
+      isVeterinarian,
+    } = req.body;
 
     const user = await User.findByPk(req.user.id, {
       attributes: ["id", "firstName", "lastName", "dni", "email", "password"],
@@ -153,7 +161,8 @@ export const editProfile = async (req, res) => {
     if (lastName) user.lastName = lastName;
     if (dni) user.dni = dni;
     if (email) user.email = email;
-
+    user.isAdmin = isAdmin;
+    user.isVeterinarian = isVeterinarian;
     const currentPasword = user.password;
 
     if (!password) user.password = currentPasword;

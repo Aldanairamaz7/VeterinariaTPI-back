@@ -16,7 +16,15 @@ userRoutes.post("/login", login);
 userRoutes.get("/user/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: ["id", "firstName", "lastName", "dni", "email"],
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "dni",
+        "email",
+        "isAdmin",
+        "isVeterinarian",
+      ],
       include: [
         {
           model: Pet,
@@ -40,6 +48,6 @@ userRoutes.post("/addpet", authenticateToken, addPet);
 
 /* Hay que testear estos endpoints */
 
-userRoutes.put("/editprofile", authenticateToken, editProfile);
+userRoutes.put("/editprofile/:id", authenticateToken, editProfile);
 
 export default userRoutes;
