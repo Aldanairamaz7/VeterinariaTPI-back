@@ -31,8 +31,16 @@ export const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    isVeterinarian: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   },
-  { timestamps: false,
-    tableName: 'users',
-  },
+  { timestamps: false, tableName: "users" }
 );

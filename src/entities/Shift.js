@@ -17,7 +17,7 @@ export const Shift = sequelize.define(
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  veterinarianId:{
+  enrollment:{
     type: DataTypes.INTEGER,
     allowNull: false,
     references:{
