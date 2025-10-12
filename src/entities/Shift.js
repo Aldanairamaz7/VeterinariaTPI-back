@@ -41,7 +41,10 @@ export const Shift = sequelize.define(
       key:'id',
     },
   },
-  
+  description:{
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 },
 {
     timestamps: false,
