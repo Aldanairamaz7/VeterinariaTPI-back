@@ -22,7 +22,7 @@ export const Shift = sequelize.define(
     allowNull: false,
     references:{
       model: 'veterinarians',
-      key: 'id'
+      key: 'enrollment'
     },
   },
   petId:{
