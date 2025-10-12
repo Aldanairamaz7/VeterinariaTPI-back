@@ -3,6 +3,7 @@ import { Pet } from "../entities/Pet.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
+    attributes: ['id', 'firstName', 'lastName', 'email', 'dni', 'isAdmin', 'isVeterinarian'],
     include: [
       {
         model: Pet,
