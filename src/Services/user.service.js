@@ -133,7 +133,6 @@ export const addPet = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
-    
     const {
       firstName,
       lastName,
@@ -144,10 +143,19 @@ export const editProfile = async (req, res) => {
       isVeterinarian,
     } = req.body;
 
-    const targetUserId = req.params.id || req.user.id
+    const targetUserId = req.params.id || req.user.id;
 
     const user = await User.findByPk(targetUserId, {
-      attributes: ["id", "firstName", "lastName", "dni", "email", "password", 'isAdmin', 'isVeterinarian'],
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "dni",
+        "email",
+        "password",
+        "isAdmin",
+        "isVeterinarian",
+      ],
       include: [
         {
           model: Pet,
@@ -163,25 +171,27 @@ export const editProfile = async (req, res) => {
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
 
-    if(dni && dni !== user.dni){
-      const existingUserDni = await User.findOne({where: {dni}})
-      if (existingUserDni && existingUserDni.id !== user.id){
-        return res.status(400).json({message: 'DNI ya se encuentra registrado.'})
+    if (dni && dni !== user.dni) {
+      const existingUserDni = await User.findOne({ where: { dni } });
+      if (existingUserDni && existingUserDni.id !== user.id) {
+        return res
+          .status(400)
+          .json({ message: "DNI ya se encuentra registrado." });
       }
-      user.dni = dni
+      user.dni = dni;
     }
 
-    if(email && email !== user.email){
-      const existingUserEmail = await User.findOne({where:{email}})
-      if(existingUserEmail && existingUserEmail.id !== user.id){
-        return res.status(400).json({message: 'Email ya registrado'})
+    if (email && email !== user.email) {
+      const existingUserEmail = await User.findOne({ where: { email } });
+      if (existingUserEmail && existingUserEmail.id !== user.id) {
+        return res.status(400).json({ message: "Email ya registrado" });
       }
-      user.email = email
+      user.email = email;
     }
 
     if (typeof isAdmin === "boolean") user.isAdmin = isAdmin;
-    if (typeof isVeterinarian === "boolean") user.isVeterinarian = isVeterinarian;
-
+    if (typeof isVeterinarian === "boolean")
+      user.isVeterinarian = isVeterinarian;
 
     const currentPasword = user.password;
     if (!password) user.password = currentPasword;

@@ -9,7 +9,14 @@ export const editPet = async (req, res) => {
       return res.status(400).json({ message: "ID de la mascota es requerido" });
     }
     const user = await User.findByPk(req.user.id, {
-      attributes: ["id", "firstName", "lastName", "dni"],
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "dni",
+        "isAdmin",
+        "isVeterinarian",
+      ],
       include: [
         {
           model: Pet,
@@ -20,12 +27,22 @@ export const editPet = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    const pet = await Pet.findOne({
-      where: {
-        id,
-        userId: user.id, //quitar para modificar mascota como admin
-      },
-    });
+    let pet;
+    if (!user.isAdmin) {
+      pet = await Pet.findOne({
+        where: {
+          id,
+          userId: user.id, //quitar para modificar mascota como admin
+        },
+      });
+    } else {
+      pet = await Pet.findOne({
+        where: {
+          id,
+        },
+      });
+    }
+
     if (!pet) {
       return res.status(404).json({ message: "Mascota no encontrada" });
     }
@@ -39,13 +56,21 @@ export const editPet = async (req, res) => {
       {
         where: {
           id,
-          userId: user.id, //quitar para modificar mascota como admin
         },
       }
     );
+    const updatedPet = await Pet.findByPk(id);
 
     const updatedUser = await User.findByPk(req.user.id, {
-      attributes: ["id", "firstName", "lastName", "dni", "email"],
+      attributes: [
+        "id",
+        "firstName",
+        "lastName",
+        "dni",
+        "email",
+        "isAdmin",
+        "isVeterinarian",
+      ],
       include: [
         {
           model: Pet,
@@ -54,9 +79,11 @@ export const editPet = async (req, res) => {
       ],
     });
 
-    return res
-      .status(200)
-      .json({ message: "Mascota actualizada con exito.", user: updatedUser });
+    return res.status(200).json({
+      message: "Mascota actualizada con exito.",
+      user: updatedUser,
+      pet: updatedPet,
+    });
   } catch (error) {
     console.error("Error al modificar la mascota", error);
     res.status(500).json({ message: "Error interno del servidor" });
