@@ -13,6 +13,7 @@ const userRoutes = Router();
 
 userRoutes.post("/register", register);
 userRoutes.post("/login", login);
+
 userRoutes.get("/user/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
