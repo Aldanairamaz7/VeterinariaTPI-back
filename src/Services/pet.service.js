@@ -2,6 +2,21 @@ import { Pet } from "../entities/Pet.js";
 import { User } from "../entities/User.js";
 
 /* Testear */
+export const getPet = async (req, res) => {
+  try {
+    const { petId } = req.params;
+    if (!petId) return res.status(404).json({ message: "Debe enviar una id" });
+    const pet = await Pet.findByPk(petId);
+    if (!pet) return res.status(404).json({ message: "Macota no encontrada" });
+
+    return res
+      .status(200)
+      .send({ message: "mascota encontrada con exito", pet });
+  } catch (error) {
+    res.status(500).json({ message: "Error interno del servidor", error });
+  }
+};
+
 export const editPet = async (req, res) => {
   try {
     const { id, name, age, breed, imageURL } = req.body;
@@ -92,9 +107,9 @@ export const editPet = async (req, res) => {
 
 export const removePet = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { petId } = req.params;
 
-    if (!id) {
+    if (!petId) {
       return res
         .status(400)
         .json({ message: "ID de la mascota es requerido." });
@@ -115,7 +130,7 @@ export const removePet = async (req, res) => {
 
     const pet = await Pet.findOne({
       where: {
-        id,
+        id: petId,
         userId: user.id,
       },
     });

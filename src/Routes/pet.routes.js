@@ -1,10 +1,11 @@
 import { Router } from "express";
-import { editPet, removePet } from "../Services/pet.service.js";
+import { editPet, getPet, removePet } from "../Services/pet.service.js";
 import { authenticateToken } from "../Services/user.service.js";
 
 const petRoutes = Router();
 
-petRoutes.put("/editPets", authenticateToken, editPet);
-petRoutes.delete("/pets/:id", authenticateToken, removePet);
+petRoutes.get("/editpet/:petId", authenticateToken, getPet);
+petRoutes.put("/editpet/:petId", authenticateToken, editPet);
+petRoutes.delete("/pets/:petId", authenticateToken, removePet);
 
 export default petRoutes;
