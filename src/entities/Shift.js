@@ -8,6 +8,7 @@ export const Shift = sequelize.define(
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+    allowNull:false, //sino no funciona
   },
   dateTime: {
     type: DataTypes.DATE,
@@ -19,7 +20,7 @@ export const Shift = sequelize.define(
   },
   enrollment:{
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true, //cuando creemos veterinarian pasar a false
     references:{
       model: 'veterinarians',
       key: 'enrollment'

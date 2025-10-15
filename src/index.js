@@ -12,6 +12,7 @@ import { defineAssociations } from "./entities/associations.js"; // Ajusta la ru
 import userRoutes from "./Routes/user.routes.js";
 import petRoutes from "./Routes/pet.routes.js";
 import adminRoutes from "./Routes/admin.routes.js";
+import shiftRoutes from "./Routes/shift.routes.js";
 
 defineAssociations();
 
@@ -31,7 +32,7 @@ async function startServer() {
     app.use(userRoutes);
     app.use(petRoutes);
     app.use(adminRoutes);
-
+    app.use(shiftRoutes);
     await sequelize.sync();
 
     app.listen(PORT, () => {
@@ -42,5 +43,5 @@ async function startServer() {
     process.exit(1);
   }
 }
-
+//await sequelize.sync({ alter: true });
 startServer();
