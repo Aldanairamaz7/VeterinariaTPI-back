@@ -5,8 +5,20 @@ import { User } from "../entities/User.js";
 export const getPet = async (req, res) => {
   try {
     const { petId } = req.params;
+    const user = await User.findByPk(req.user.id);
     if (!petId) return res.status(404).json({ message: "Debe enviar una id" });
-    const pet = await Pet.findByPk(petId);
+    let pet;
+    if (!user.isAdmin) {
+      pet = await Pet.findOne({
+        where: {
+          id: petId,
+          userId: user.id,
+        },
+      });
+    } else {
+      pet = await Pet.findByPk(petId);
+    }
+
     if (!pet) return res.status(404).json({ message: "Macota no encontrada" });
 
     return res
@@ -127,13 +139,21 @@ export const removePet = async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
-
-    const pet = await Pet.findOne({
-      where: {
-        id: petId,
-        userId: user.id,
-      },
-    });
+    let pet;
+    if (!user.isAdmin) {
+      pet = await Pet.findOne({
+        where: {
+          id: petId,
+          userId: user.id,
+        },
+      });
+    } else {
+      pet = await Pet.findOne({
+        where: {
+          id: petId,
+        },
+      });
+    }
 
     if (!pet) {
       return res.status(404).json({ message: "Mascota no encontrada." });
