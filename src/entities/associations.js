@@ -24,6 +24,6 @@ export const defineAssociations = () => {
   });
   Shift.belongsTo(Veterinarian, { foreignKey: "enrollment" });
 
-  User.hasMany(Roles, {foreignKey: "userId", onDelete: "CASCADE"});
-  Roles.belongsTo(User, {foreignKey: "userId", as: "user"});
+  Roles.hasMany(User, { foreignKey: "idRole", onDelete: "CASCADE" });
+  User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
 };

@@ -76,8 +76,7 @@ export const login = async (req, res) => {
       id: user.id,
       firstName: user.firstName,
       email: user.email,
-      isAdmin: user.isAdmin,
-      isVeterinarian: user.isVeterinarian,
+      idRole: user.idRole,
     },
   });
 };
@@ -133,15 +132,7 @@ export const addPet = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
-    const {
-      firstName,
-      lastName,
-      dni,
-      email,
-      password,
-      isAdmin,
-      isVeterinarian,
-    } = req.body;
+    const { firstName, lastName, dni, email, password, idRole } = req.body;
 
     const targetUserId = req.params.id || req.user.id;
 
@@ -153,8 +144,7 @@ export const editProfile = async (req, res) => {
         "dni",
         "email",
         "password",
-        "isAdmin",
-        "isVeterinarian",
+        "idRole",
       ],
       include: [
         {
@@ -189,9 +179,7 @@ export const editProfile = async (req, res) => {
       user.email = email;
     }
 
-    if (typeof isAdmin === "boolean") user.isAdmin = isAdmin;
-    if (typeof isVeterinarian === "boolean")
-      user.isVeterinarian = isVeterinarian;
+    user.idRole = idRole;
 
     const currentPasword = user.password;
     if (!password) user.password = currentPasword;

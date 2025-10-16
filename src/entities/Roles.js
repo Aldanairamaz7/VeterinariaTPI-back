@@ -1,29 +1,22 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../db";
+import { sequelize } from "../db.js";
 
 export const Roles = sequelize.define(
-    "Roles",
-    {
-        idRole: {
-            type: DataTypes.INTEGER,
-            primaryKey: true,
-            allowNull: false
-        },
-        roleSumary: {
-            type: DataTypes.TEXT,
-            allowNull: true
-        },
-        userId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: {
-                model: 'users',
-                key: 'id'
-            }
-        }
+  "Roles",
+  {
+    idRole: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      allowNull: false,
+      autoIncrement: true,
     },
-    {
-        timestamps: false,
-        tableName: 'roles'
-    }
-)
+    roleSumary: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+  },
+  {
+    timestamps: false,
+    tableName: "roles",
+  }
+);

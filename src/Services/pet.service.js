@@ -36,14 +36,7 @@ export const editPet = async (req, res) => {
       return res.status(400).json({ message: "ID de la mascota es requerido" });
     }
     const user = await User.findByPk(req.user.id, {
-      attributes: [
-        "id",
-        "firstName",
-        "lastName",
-        "dni",
-        "isAdmin",
-        "isVeterinarian",
-      ],
+      attributes: ["id", "firstName", "lastName", "dni", "idRole"],
       include: [
         {
           model: Pet,
@@ -55,7 +48,7 @@ export const editPet = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
     let pet;
-    if (!user.isAdmin) {
+    if (user.idRole < 2) {
       pet = await Pet.findOne({
         where: {
           id,
@@ -89,15 +82,7 @@ export const editPet = async (req, res) => {
     const updatedPet = await Pet.findByPk(id);
 
     const updatedUser = await User.findByPk(req.user.id, {
-      attributes: [
-        "id",
-        "firstName",
-        "lastName",
-        "dni",
-        "email",
-        "isAdmin",
-        "isVeterinarian",
-      ],
+      attributes: ["id", "firstName", "lastName", "dni", "email", "idRole"],
       include: [
         {
           model: Pet,
@@ -140,7 +125,7 @@ export const removePet = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
     let pet;
-    if (!user.isAdmin) {
+    if (user.idRole < 2) {
       pet = await Pet.findOne({
         where: {
           id: petId,

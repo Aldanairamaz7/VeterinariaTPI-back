@@ -1,21 +1,18 @@
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
+import { Roles } from "../entities/Roles.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
-    attributes: [
-      "id",
-      "firstName",
-      "lastName",
-      "email",
-      "dni",
-      "isAdmin",
-      "isVeterinarian",
-    ],
+    attributes: ["id", "firstName", "lastName", "email", "dni", "idRole"],
     include: [
       {
         model: Pet,
         as: "pets",
+      },
+      {
+        model: Roles,
+        as: "roles",
       },
     ],
   });
@@ -24,11 +21,18 @@ export const adminGetUser = async (req, res) => {
 };
 
 export const adminDeleteUser = async (req, res) => {
-  const { id } = req.body;
-  const user = await User.findByPk(id);
+  const { idUserDelete } = req.body;
+  if (!idUserDelete)
+    return res
+      .status(404)
+      .json({ message: "Se necesita un id para eliminar un usuario" });
+  const user = await User.findByPk(idUserDelete);
+  if (!user)
+    return res.status(404).json({ message: "No se encontro al usuario" });
   await user.destroy();
 
-  res.status(200).json({ message: `Usuario con id ${id} eliminado` });
+  const allUsers = await User.findAll();
+  res.status(200).json({ message: `Usuario eliminado`, allUsers });
 };
 
 export const adminGetUserPets = async (req, res) => {

@@ -9,7 +9,25 @@ import {
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 
+//import { Roles } from "../entities/Roles.js";
+
 const userRoutes = Router();
+
+/*
+userRoutes.post("/createrole", async (req, res) => {
+  const { rol } = req.body;
+  const newRol = await Roles.create({
+    roleSumary: rol,
+  });
+  return res.status(200).send({ message: "rol creado", newRol });
+});
+
+userRoutes.delete("/createrole", async (req, res) => {
+  const role = await Roles.findByPk(2);
+  role.destroy();
+  return res.status(200).send({ message: "rol borraro" });
+});
+*/
 
 userRoutes.post("/register", register);
 userRoutes.post("/login", login);
@@ -17,15 +35,7 @@ userRoutes.post("/login", login);
 userRoutes.get("/user/me", authenticateToken, async (req, res) => {
   try {
     const user = await User.findByPk(req.user.id, {
-      attributes: [
-        "id",
-        "firstName",
-        "lastName",
-        "dni",
-        "email",
-        "isAdmin",
-        "isVeterinarian",
-      ],
+      attributes: ["id", "firstName", "lastName", "dni", "email", "idRole"],
       include: [
         {
           model: Pet,
