@@ -8,7 +8,7 @@ export const getPet = async (req, res) => {
     const user = await User.findByPk(req.user.id);
     if (!petId) return res.status(404).json({ message: "Debe enviar una id" });
     let pet;
-    if (!user.isAdmin) {
+    if (user.idRole !== 3) {
       pet = await Pet.findOne({
         where: {
           id: petId,
@@ -125,7 +125,7 @@ export const removePet = async (req, res) => {
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
     let pet;
-    if (user.idRole < 2) {
+    if (user.idRole !== 3) {
       pet = await Pet.findOne({
         where: {
           id: petId,

@@ -4,6 +4,7 @@ import { Pet } from "../entities/Pet.js";
 import { authenticateToken } from "../Services/user.service.js";
 import {
   adminDeleteUser,
+  adminGetAllPets,
   adminGetUser,
   adminGetUserPets,
 } from "../Services/admin.services.js";
@@ -17,5 +18,7 @@ adminRoutes.get(
   authenticateToken,
   adminGetUserPets
 );
+
+adminRoutes.get("/adminpanel/pets", authenticateToken, adminGetAllPets);
 
 export default adminRoutes;

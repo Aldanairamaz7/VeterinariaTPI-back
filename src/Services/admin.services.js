@@ -48,3 +48,22 @@ export const adminGetUserPets = async (req, res) => {
     return res.status(404).send({ message: "Mascotas no encontradas" });
   res.status(200).send({ message: "Mascota/s encontrada/s con exito", pets });
 };
+
+export const adminGetAllPets = async (req, res) => {
+  if (req.user.idRole !== 3)
+    return res.status(403).send({ message: "no tienes permisos" });
+
+  const pets = await Pet.findAll({
+    include: [
+      {
+        model: User,
+        as: "user",
+      },
+    ],
+  });
+
+  if (!pets)
+    return res.status(404).send({ message: "no se encontraron las mascotas" });
+
+  res.status(200).send({ message: "mascotas encontradas", pets });
+};

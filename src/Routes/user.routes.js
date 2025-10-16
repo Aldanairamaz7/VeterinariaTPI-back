@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addPet,
   authenticateToken,
+  editGetUser,
   editProfile,
   login,
   register,
@@ -56,6 +57,7 @@ userRoutes.get("/user/me", authenticateToken, async (req, res) => {
 });
 
 userRoutes.post("/addpet", authenticateToken, addPet);
+userRoutes.get("/editprofile/:userId", authenticateToken, editGetUser);
 
 /* Hay que testear estos endpoints */
 

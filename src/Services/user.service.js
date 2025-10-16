@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { validateEmail, validatePassword } from "../utils/validations.js";
+import { Roles } from "../entities/Roles.js";
 
 export const register = async (req, res) => {
   try {
@@ -132,7 +133,8 @@ export const addPet = async (req, res) => {
 
 export const editProfile = async (req, res) => {
   try {
-    const { firstName, lastName, dni, email, password, idRole } = req.body;
+    const { userData } = req.body;
+    const { firstName, lastName, dni, email, password, idRole } = userData;
 
     const targetUserId = req.params.id || req.user.id;
 
@@ -202,5 +204,26 @@ export const editProfile = async (req, res) => {
   } catch (error) {
     console.error("Error en editProfile: ", error);
     res.status(500).json({ message: "Error del servidor" });
+  }
+};
+
+export const editGetUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!userId) return res.status(404).send({ message: "se necesita una id" });
+    const user = await User.findByPk(userId);
+    const roles = await Roles.findAll();
+
+    if (!user)
+      return res.status(404).send({ message: "No se encontro el usuario" });
+
+    if (req.user.id !== user.id && req.user.idRole !== 3)
+      return res
+        .status(403)
+        .send({ message: "No tenes permisos para editar otros usuarios" });
+
+    return res.status(200).send({ message: "usuario encontrado", user, roles });
+  } catch (err) {
+    return res.status(500).send({ message: "Error interno del servidor" });
   }
 };
