@@ -2,8 +2,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
+import { Veterinarian } from "../entities/Veterinarian.js"
 import { validateEmail, validatePassword } from "../utils/validations.js";
 import { Roles } from "../entities/Roles.js";
+
+
 
 export const register = async (req, res) => {
   try {
@@ -20,6 +23,15 @@ export const register = async (req, res) => {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(password, salt);
+
+    const userRole = await Roles.findByPk(1);
+
+    if(!userRole){
+      await Roles.create({
+        id: 1,
+        roleSumary: "Usuario"
+      })
+    }
 
     const newUser = await User.create({
       firstName,
@@ -137,7 +149,7 @@ export const editProfile = async (req, res) => {
     const { firstName, lastName, dni, email, password, idRole } = userData;
 
     const targetUserId = req.params.id || req.user.id;
-
+    // Fijarse si es que anda lo relacionado al veterinario.
     const user = await User.findByPk(targetUserId, {
       attributes: [
         "id",
@@ -147,12 +159,18 @@ export const editProfile = async (req, res) => {
         "email",
         "password",
         "idRole",
+/*         "enrollment",
+        "speciality" */
       ],
       include: [
         {
           model: Pet,
           as: "pets",
         },
+/*         {
+          model: Veterinarian,
+          as: "veterinarian"
+        } */
       ],
     });
 
@@ -191,6 +209,22 @@ export const editProfile = async (req, res) => {
       const salt = await bcrypt.genSalt(saltRounds);
       user.password = await bcrypt.hash(password, salt);
     }
+
+    //Fijarse si anda para la especialedad del veterinario.
+
+/*     if(req.body.userData.idRole === 2){
+      const { enrollment, speciality } = req.body.userData;
+
+      await Veterinarian.upsert({
+        enrollment,
+        speciality,
+        userId: req.params.id
+      })
+    } else {
+      await Veterinarian.destroy({
+        where: {userId: req.params.id}
+      })
+    }  */
 
     await user.save();
 
