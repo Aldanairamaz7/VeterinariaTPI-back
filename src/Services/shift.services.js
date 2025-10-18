@@ -2,7 +2,7 @@ import { Shift } from "../entities/Shift.js";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 
-    const allowedTypeConsult = ['consulta', 'control', 'cirujia', 'estilista'];
+  const allowedTypeConsult = ['consulta', 'control', 'cirujia', 'estilista'];
 
 export const createShift = async (req, res) => {
   try {
@@ -33,14 +33,9 @@ export const createShift = async (req, res) => {
       if (!petExists) {
         return res.status(404).json({ message: "Mascota no encontrada." });
       }
-    }
+    } 
 
-    // Validar formato de dateTime (opcional; depende de tu DB/ORM)
-    // Ejemplo simple: comprobar que es una fecha válida
-    const date = new Date(dateTime);
-    if (isNaN(date.getTime())) {
-      return res.status(400).json({ message: "fecha no es una fecha válida." });
-    }
+    
         
         const newShift = await Shift.create({
             userId,
@@ -56,3 +51,23 @@ export const createShift = async (req, res) => {
         res.status(500).json({ message: "error interno del servidor", error});
     }
 }
+
+export const historyShift = async (req, res) => {
+   try {
+    const { userId } = req.params;
+    
+    const shifts = await Shift.findAll({
+      where: { userId },
+      include: [
+        { model: User, attributes: ['name', 'email'] },
+        { model: Pet, attributes: ['name', 'breed'] },
+      ],
+      order: [['dateTime', 'ASC']]
+    });
+
+    res.status(200).json({ shifts });
+  } catch (error) {
+    console.error("error al obtener turnos", error);
+    res.status(500).json({ message: "error interno del servidor", error });
+  }
+};
