@@ -29,8 +29,7 @@ export const defineAssociations = () => {
   User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
 
   Speciality.hasMany(Veterinarian, {
-    foreignKey: "idSpeciality",
-    onDelete: "CASCADE",
+    foreignKey: "idSpeciality"
   });
   Veterinarian.belongsTo(Speciality, {
     foreignKey: "idSpeciality",

@@ -13,7 +13,7 @@ export const Veterinarian = sequelize.define(
       allowNull: false,
       references: {
         model: "speciality",
-        key: "idSpeciality",
+        key: "idSpeciality"
       },
     },
     userId: {
