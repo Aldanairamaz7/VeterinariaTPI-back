@@ -50,7 +50,7 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      /*idRol: 3, descomentar esta linea para crear un usuario con rol de admin*/
+      /*idRole: 3 descomentar esta linea para crear un usuario con rol de admin*/
     });
 
     return res.status(201).json({ newUser });
@@ -181,18 +181,12 @@ export const editProfile = async (req, res) => {
         "email",
         "password",
         "idRole",
-        /*         "enrollment",
-        "speciality" */
       ],
       include: [
         {
           model: Pet,
           as: "pets",
         },
-        /*         {
-          model: Veterinarian,
-          as: "veterinarian"
-        } */
       ],
     });
 
@@ -239,6 +233,10 @@ export const editProfile = async (req, res) => {
         const especialidad = await Speciality.create({
           specialityName: speciality,
         });
+        if (!especialidad)
+          return res
+            .status(400)
+            .send({ message: "no se pudo crear la especialidad" });
         specialityId = especialidad.idSpeciality;
       } else {
         specialityId = Number(ddSpeciality);
@@ -249,6 +247,10 @@ export const editProfile = async (req, res) => {
         idSpeciality: specialityId,
         userId: targetUserId,
       });
+      if (!veterinarian)
+        return res
+          .status(400)
+          .send({ message: "no se pudo crear el veterinario" });
     }
 
     const currentPasword = user.password;
@@ -259,22 +261,6 @@ export const editProfile = async (req, res) => {
       const salt = await bcrypt.genSalt(saltRounds);
       user.password = await bcrypt.hash(password, salt);
     }
-
-    //Fijarse si anda para la especialedad del veterinario.
-
-    /*     if(req.body.userData.idRole === 2){
-      const { enrollment, speciality } = req.body.userData;
-
-      await Veterinarian.upsert({
-        enrollment,
-        speciality,
-        userId: req.params.id
-      })
-    } else {
-      await Veterinarian.destroy({
-        where: {userId: req.params.id}
-      })
-    }  */
 
     await user.save();
 
