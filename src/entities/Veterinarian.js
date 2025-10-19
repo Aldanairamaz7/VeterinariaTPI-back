@@ -8,9 +8,13 @@ export const Veterinarian = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
     },
-    specialty: {
-      type: DataTypes.STRING,
+    idSpecialty: {
+      type: DataTypes.INTEGER,
       allowNull: false,
+      references: {
+        model: "speciality",
+        key: "idSpeciality"
+      }
     },
     userId: {
         type: DataTypes.INTEGER,

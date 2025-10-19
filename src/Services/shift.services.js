@@ -71,3 +71,57 @@ export const historyShift = async (req, res) => {
     res.status(500).json({ message: "error interno del servidor", error });
   }
 };
+export const checkoutShift = async (req, res) =>{
+  const { userId }= req.params
+  try{
+    const shifts = await Shift.findAll({
+      where:{ userId},
+      include:[
+        {
+          model: Pet,
+          attributes:['id', 'name', 'breed']
+        }
+      ],
+      order:[['dateTime', 'DESC']]
+
+    });
+
+    const formatedShift = shifts.map(shift =>({
+      id: shift.id,
+      dateTime: shift.dateTime,
+      typeConsult: shift.typeConsult,
+      description: shift.description,
+      petName: shift.Pet.name,
+      breed: shift.Pet.breed
+    }))
+
+    res.json(formatedShift)
+
+  }
+
+  catch(error){
+    res.status(500).json({error: 'Error al obtener turnos'})
+  }
+}
+
+export const cancelShift = async (req,res) =>{
+  const { id } = req.params
+  const userIdFromToken = req.user.id
+
+  try{
+    const shift = await Shift.findByPk(id)
+    if(!shift){
+      return res.status(404).json({message: 'Turno no encontrado'});
+    }
+
+    if(shift.userId !== userIdFromToken){
+      return res.status(403).json({ message: 'No tiene permiso para cancelar el turno'})
+    }
+
+    await shift.destroy();
+    return res.status(200).json({ message: 'Turno cancelado con exito.'})
+  }catch(err){
+    return res.status(500).json({error: 'Error interno del servidor.'})
+  }
+
+}
