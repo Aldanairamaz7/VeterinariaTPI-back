@@ -2,22 +2,33 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
-import { Veterinarian } from "../entities/Veterinarian.js"
+import { Veterinarian } from "../entities/Veterinarian.js";
 import { validateEmail, validatePassword } from "../utils/validations.js";
 import { Roles } from "../entities/Roles.js";
-
-
+import { Speciality } from "../entities/Speciality.js";
 
 export const register = async (req, res) => {
   try {
     const { firstName, lastName, dni, email, password } = req.body;
 
-    const user = await User.findOne({
+    let user = await User.findOne({
       where: { email },
     });
 
     if (user) {
-      return res.status(400).json({ message: "El usuario ya existe" });
+      return res
+        .status(400)
+        .send({ message: "Ya existe un usuario con ese email" });
+    }
+
+    user = await User.findOne({
+      where: { dni },
+    });
+
+    if (user) {
+      return res
+        .status(400)
+        .send({ message: "Ya existe un usuario con ese dni" });
     }
 
     const saltRounds = 10;
@@ -26,11 +37,11 @@ export const register = async (req, res) => {
 
     const userRole = await Roles.findByPk(1);
 
-    if(!userRole){
+    if (!userRole) {
       await Roles.create({
         id: 1,
-        roleSumary: "Usuario"
-      })
+        roleSumary: "Usuario",
+      });
     }
 
     const newUser = await User.create({
@@ -39,6 +50,7 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
+      /*idRol: 3, descomentar esta linea para crear un usuario con rol de admin*/
     });
 
     return res.status(201).json({ newUser });
@@ -146,7 +158,17 @@ export const addPet = async (req, res) => {
 export const editProfile = async (req, res) => {
   try {
     const { userData } = req.body;
-    const { firstName, lastName, dni, email, password, idRole } = userData;
+    const {
+      firstName,
+      lastName,
+      dni,
+      email,
+      password,
+      idRole,
+      enrollment,
+      ddSpeciality,
+      speciality,
+    } = userData;
 
     const targetUserId = req.params.id || req.user.id;
     // Fijarse si es que anda lo relacionado al veterinario.
@@ -159,7 +181,7 @@ export const editProfile = async (req, res) => {
         "email",
         "password",
         "idRole",
-/*         "enrollment",
+        /*         "enrollment",
         "speciality" */
       ],
       include: [
@@ -167,7 +189,7 @@ export const editProfile = async (req, res) => {
           model: Pet,
           as: "pets",
         },
-/*         {
+        /*         {
           model: Veterinarian,
           as: "veterinarian"
         } */
@@ -201,6 +223,34 @@ export const editProfile = async (req, res) => {
 
     user.idRole = idRole;
 
+    if (idRole === 2) {
+      if (!enrollment) {
+        return res.status(404).send({ message: "Es necesario una matricula" });
+      }
+
+      let specialityId;
+
+      if (Number(ddSpeciality) === 0 && !speciality) {
+        return res
+          .status(404)
+          .send({ message: "Es necesario una especialidad" });
+      }
+      if (Number(ddSpeciality) === 0 && speciality) {
+        const especialidad = await Speciality.create({
+          specialityName: speciality,
+        });
+        specialityId = especialidad.idSpeciality;
+      } else {
+        specialityId = Number(ddSpeciality);
+      }
+
+      const veterinarian = await Veterinarian.create({
+        enrollment,
+        idSpeciality: specialityId,
+        userId: targetUserId,
+      });
+    }
+
     const currentPasword = user.password;
     if (!password) user.password = currentPasword;
 
@@ -212,7 +262,7 @@ export const editProfile = async (req, res) => {
 
     //Fijarse si anda para la especialedad del veterinario.
 
-/*     if(req.body.userData.idRole === 2){
+    /*     if(req.body.userData.idRole === 2){
       const { enrollment, speciality } = req.body.userData;
 
       await Veterinarian.upsert({
@@ -245,8 +295,14 @@ export const editGetUser = async (req, res) => {
   try {
     const { userId } = req.params;
     if (!userId) return res.status(404).send({ message: "se necesita una id" });
-    const user = await User.findByPk(userId);
+    const user = await User.findByPk(userId, {
+      include: {
+        model: Veterinarian,
+        as: "veterinarian",
+      },
+    });
     const roles = await Roles.findAll();
+    const specialitys = await Speciality.findAll();
 
     if (!user)
       return res.status(404).send({ message: "No se encontro el usuario" });
@@ -256,7 +312,9 @@ export const editGetUser = async (req, res) => {
         .status(403)
         .send({ message: "No tenes permisos para editar otros usuarios" });
 
-    return res.status(200).send({ message: "usuario encontrado", user, roles });
+    return res
+      .status(200)
+      .send({ message: "usuario encontrado", user, roles, specialitys });
   } catch (err) {
     return res.status(500).send({ message: "Error interno del servidor" });
   }

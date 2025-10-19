@@ -10,7 +10,7 @@ export const defineAssociations = () => {
   User.hasMany(Pet, { foreignKey: "userId", onDelete: "CASCADE", as: "pets" });
   Pet.belongsTo(User, { foreignKey: "userId", as: "user" });
 
-  User.hasMany(Veterinarian, { foreignKey: "userId", onDelete: "CASCADE" });
+  User.hasOne(Veterinarian, { foreignKey: "userId", onDelete: "CASCADE" });
   Veterinarian.belongsTo(User, { foreignKey: "userId", as: "veterinarian" });
 
   Pet.hasMany(Shift, { foreignKey: "petId", onDelete: "CASCADE" });
@@ -28,6 +28,12 @@ export const defineAssociations = () => {
   Roles.hasMany(User, { foreignKey: "idRole", onDelete: "CASCADE" });
   User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
 
-  Speciality.hasMany(Veterinarian, {foreignKey: "idSpeciality", onDelete: "CASCADE"});
-  Veterinarian.belongsTo(Speciality, {foreignKey: "idSpeciality", as: "speciality"});
+  Speciality.hasMany(Veterinarian, {
+    foreignKey: "idSpeciality",
+    onDelete: "CASCADE",
+  });
+  Veterinarian.belongsTo(Speciality, {
+    foreignKey: "idSpeciality",
+    as: "speciality",
+  });
 };

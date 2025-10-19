@@ -8,7 +8,7 @@ import "./entities/Pet.js";
 import "./entities/Shift.js";
 import "./entities/Veterinarian.js";
 import "./entities/Roles.js";
-import "./entities/Speciality.js"
+import "./entities/Speciality.js";
 
 import { defineAssociations } from "./entities/associations.js"; // Ajusta la ruta según tu estructura
 import userRoutes from "./Routes/user.routes.js";
@@ -17,10 +17,7 @@ import adminRoutes from "./Routes/admin.routes.js";
 import shiftRoutes from "./Routes/shift.routes.js";
 import { initializationRoles } from "./Services/role.service.js";
 
-
 defineAssociations();
-initializationRoles();
-
 
 const app = express();
 
@@ -44,6 +41,7 @@ async function startServer() {
     app.listen(PORT, () => {
       console.log(`Servidor escuchando en http://localhost:${PORT}`);
     });
+    initializationRoles();
   } catch (err) {
     console.error("Error durante el inicio:", err);
     process.exit(1);
