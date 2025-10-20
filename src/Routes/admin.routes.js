@@ -3,8 +3,10 @@ import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { authenticateToken } from "../Services/user.service.js";
 import {
+  adminDeleteSpeciality,
   adminDeleteUser,
   adminGetAllPets,
+  adminGetSpecialities,
   adminGetUser,
   adminGetUserPets,
 } from "../Services/admin.services.js";
@@ -20,5 +22,14 @@ adminRoutes.get(
 );
 
 adminRoutes.get("/adminpanel/pets", authenticateToken, adminGetAllPets);
-
+adminRoutes.get(
+  "/adminpanel/specialities",
+  authenticateToken,
+  adminGetSpecialities
+);
+adminRoutes.delete(
+  "/adminpanel/specialities/:idSpe",
+  authenticateToken,
+  adminDeleteSpeciality
+);
 export default adminRoutes;

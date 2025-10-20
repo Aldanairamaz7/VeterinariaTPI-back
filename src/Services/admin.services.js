@@ -1,6 +1,7 @@
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { Roles } from "../entities/Roles.js";
+import { Speciality } from "../entities/Speciality.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
@@ -66,4 +67,36 @@ export const adminGetAllPets = async (req, res) => {
     return res.status(404).send({ message: "no se encontraron las mascotas" });
 
   res.status(200).send({ message: "mascotas encontradas", pets });
+};
+
+export const adminGetSpecialities = async (req, res) => {
+  const specialities = await Speciality.findAll();
+
+  if (!specialities)
+    return res
+      .status(404)
+      .send({ message: "No se encontraron especialidades" });
+
+  res.status(200).send({ message: "especialidades encontradas", specialities });
+};
+
+export const adminDeleteSpeciality = async (req, res) => {
+  const { idSpe } = req.params;
+  if (!idSpe)
+    return res
+      .status(404)
+      .send({ message: "Se necesita una id para eliminar la especialidad" });
+
+  const speciality = await Speciality.findByPk(idSpe);
+
+  if (!speciality)
+    return res.status(404).send({ message: "No se encontro la especialidad" });
+
+  await speciality.destroy();
+
+  const specialities = await Speciality.findAll();
+
+  return res
+    .status(200)
+    .send({ message: "Especialidad borrada con exito", specialities });
 };
