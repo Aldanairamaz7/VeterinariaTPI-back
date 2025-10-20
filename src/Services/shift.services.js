@@ -2,6 +2,8 @@ import { Shift } from "../entities/Shift.js";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { Op } from "sequelize";
+import { Speciality } from "../entities/Speciality.js";
+import { Veterinarian } from "../entities/Veterinarian.js";
 
 const allowedTypeConsult = ["consulta", "control", "cirujia", "estilista"];
 
@@ -45,7 +47,7 @@ export const createShift = async (req, res) => {
     }
     const startOfDay = new Date(dateTime);
     startOfDay.setHours(0, 0, 0, 0);
-    
+
     const endOfDay = new Date(dateTime);
     endOfDay.setHours(23, 59, 59, 999);
     const { count } = await Shift.findAndCountAll({
@@ -147,4 +149,22 @@ export const cancelShift = async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: "Error interno del servidor." });
   }
+};
+export const getSpeciality = async (req, res) => {
+  const specialities = await Speciality.findAll();
+  if (!specialities)
+    return res
+      .status(404)
+      .json({ message: "no se pudo encontarar especialidades" });
+  const veterinarians = await User.findAll({ where: { idRole: 2 }, include: [{ model: Veterinarian, as: "vet"}] });
+  if (!veterinarians)
+    return res.status(404).json({ message: "no se encontraron veterinarios" });
+
+  res
+    .status(200)
+    .json({
+      message: "se econtraron especialidades y veterinarios",
+      specialities,
+      veterinarians,
+    });
 };
