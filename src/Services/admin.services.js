@@ -100,3 +100,48 @@ export const adminDeleteSpeciality = async (req, res) => {
     .status(200)
     .send({ message: "Especialidad borrada con exito", specialities });
 };
+
+export const adminGetEditSpe = async (req, res) => {
+  const { idSpe } = req.params;
+
+  if (!idSpe)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para buscar la especialidad" });
+
+  const speciality = await Speciality.findByPk(idSpe);
+
+  if (!speciality)
+    return res.status(404).send({ message: "no se encontro la especialidad" });
+
+  res.status(200).send({ message: "se encontro al especialidad", speciality });
+};
+
+export const adminPutEditSpe = async (req, res) => {
+  const { idSpe } = req.params;
+  if (!idSpe)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para actualizar una especialidad" });
+
+  const { speciality } = req.body;
+  if (!speciality)
+    return res
+      .status(500)
+      .send({ message: "No se recibio ninguna especialidad" });
+  const { idSpeciality, specialityName } = speciality;
+
+  if (Number(idSpe) !== idSpeciality)
+    return res.status(500).send({ message: "Error en los datos enviados" });
+
+  const updateSpe = await Speciality.findByPk(idSpe);
+
+  if (!updateSpe)
+    return res.status(404).send({ message: "No se encontro la especialidad" });
+
+  updateSpe.specialityName = specialityName;
+
+  await updateSpe.save();
+
+  res.status(200).send({ message: "Especialidad actualizada correctamente" });
+};

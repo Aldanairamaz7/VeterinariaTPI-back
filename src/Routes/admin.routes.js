@@ -6,9 +6,11 @@ import {
   adminDeleteSpeciality,
   adminDeleteUser,
   adminGetAllPets,
+  adminGetEditSpe,
   adminGetSpecialities,
   adminGetUser,
   adminGetUserPets,
+  adminPutEditSpe,
 } from "../Services/admin.services.js";
 
 const adminRoutes = Router();
@@ -32,4 +34,8 @@ adminRoutes.delete(
   authenticateToken,
   adminDeleteSpeciality
 );
+
+adminRoutes.get("/editspeciality/:idSpe", authenticateToken, adminGetEditSpe);
+adminRoutes.put("/editspeciality/:idSpe", authenticateToken, adminPutEditSpe);
+
 export default adminRoutes;

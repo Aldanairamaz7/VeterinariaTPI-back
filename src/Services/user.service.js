@@ -165,6 +165,7 @@ export const editProfile = async (req, res) => {
       email,
       password,
       idRole,
+      prevIdRole,
       enrollment,
       ddSpeciality,
       speciality,
@@ -241,16 +242,32 @@ export const editProfile = async (req, res) => {
       } else {
         specialityId = Number(ddSpeciality);
       }
+      let veterinarian = await Veterinarian.findByPk(enrollment);
 
-      const veterinarian = await Veterinarian.create({
-        enrollment,
-        idSpeciality: specialityId,
-        userId: targetUserId,
-      });
-      if (!veterinarian)
-        return res
-          .status(400)
-          .send({ message: "no se pudo crear el veterinario" });
+      if (!veterinarian) {
+        veterinarian = await Veterinarian.create({
+          enrollment,
+          idSpeciality: specialityId,
+          userId: targetUserId,
+        });
+        if (veterinarian)
+          res.status(200).send({ message: "Veterinario creado con exito" });
+        else {
+          res
+            .status(500)
+            .send({ message: "No se pudo actualizar el veterinario" });
+        }
+      } else {
+        veterinarian.idSpeciality = specialityId;
+
+        res.status(200).send({ message: "Veterinario actualizado con exito" });
+      }
+      await veterinarian.save();
+    }
+
+    if (prevIdRole === 2 && prevIdRole !== idRole) {
+      const delVet = await Veterinarian.findByPk(enrollment);
+      await delVet.destroy();
     }
 
     const currentPasword = user.password;
