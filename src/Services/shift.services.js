@@ -150,21 +150,29 @@ export const cancelShift = async (req, res) => {
     return res.status(500).json({ error: "Error interno del servidor." });
   }
 };
-export const getSpeciality = async (req, res) => {
-  const specialities = await Speciality.findAll();
-  if (!specialities)
-    return res
-      .status(404)
-      .json({ message: "no se pudo encontarar especialidades" });
-  const veterinarians = await User.findAll({ where: { idRole: 2 }, include: [{ model: Veterinarian, as: "vet"}] });
-  if (!veterinarians)
-    return res.status(404).json({ message: "no se encontraron veterinarios" });
 
-  res
-    .status(200)
-    .json({
+export const getSpeciality = async (req, res) => {
+  try {
+    const specialities = await Speciality.findAll();
+    if (!specialities)
+      return res
+        .status(404)
+        .json({ message: "no se pudo encontarar especialidades" });
+    const veterinarians = await User.findAll({
+      where: { idRole: 2 },
+      include: [{ model: Veterinarian, as: "veterinarian" }],
+    });
+    if (!veterinarians)
+      return res
+        .status(404)
+        .json({ message: "no se encontraron veterinarios" });
+
+    return res.status(200).send({
       message: "se econtraron especialidades y veterinarios",
       specialities,
       veterinarians,
     });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
 };

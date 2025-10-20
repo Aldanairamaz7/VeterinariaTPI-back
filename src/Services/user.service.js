@@ -50,7 +50,7 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      //idRole: 3 descomentar esta linea para crear un usuario con rol de admin
+      //idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
     });
 
     return res.status(201).json({ newUser });
