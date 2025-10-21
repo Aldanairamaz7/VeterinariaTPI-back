@@ -20,14 +20,14 @@ export const createShift = async (req, res) => {
     if (!typeConsult) {
       return res.status(400).json({ message: "El campo type es obligatorio." });
     }
-    if (!allowedTypeConsult.includes(typeConsult)) {
+    /*if (!allowedTypeConsult.includes(typeConsult)) {
       return res.status(400).json({
         message:
           "Tipo de colsuta inválido. Debe ser uno de: ${allowedTypeConsult.join(', ')}",
       });
     }
-
-    if (petId === undefined || petId === null || petId === "") {
+    */
+    if (petId === undefined || petId === null) {
       return res
         .status(400)
         .json({ message: "El campo petId es obligatorio." });
