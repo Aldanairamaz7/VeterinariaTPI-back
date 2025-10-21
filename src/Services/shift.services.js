@@ -5,8 +5,6 @@ import { Op } from "sequelize";
 import { Speciality } from "../entities/Speciality.js";
 import { Veterinarian } from "../entities/Veterinarian.js";
 
-const allowedTypeConsult = ["consulta", "control", "cirujia", "estilista"];
-
 export const createShift = async (req, res) => {
   try {
     const { userId, dateTime, typeConsult, petId, description, enrollment } =

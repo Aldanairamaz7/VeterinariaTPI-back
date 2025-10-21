@@ -27,7 +27,15 @@ export const adminDeleteUser = async (req, res) => {
     return res
       .status(404)
       .json({ message: "Se necesita un id para eliminar un usuario" });
-  const user = await User.findByPk(idUserDelete);
+  const user = await User.findByPk(idUserDelete, {
+    include: [
+      {
+        model: Roles,
+        as: "roles",
+        attributes: ["roleSumary"],
+      },
+    ],
+  });
   if (!user)
     return res.status(404).json({ message: "No se encontro al usuario" });
   await user.destroy();
