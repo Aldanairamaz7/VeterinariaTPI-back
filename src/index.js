@@ -9,6 +9,7 @@ import "./entities/Shift.js";
 import "./entities/Veterinarian.js";
 import "./entities/Roles.js";
 import "./entities/Speciality.js";
+import "./entities/TypePets.js";
 
 import { defineAssociations } from "./entities/associations.js"; // Ajusta la ruta según tu estructura
 import userRoutes from "./Routes/user.routes.js";
