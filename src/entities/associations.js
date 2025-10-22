@@ -37,6 +37,13 @@ export const defineAssociations = () => {
     foreignKey: "idSpeciality",
     as: "speciality",
   });
+
   TypePet.hasMany(Breed, { foreignKey: "idTypePet" });
   Breed.belongsTo(TypePet, { foreignKey: "idTypePet" });
+
+  TypePet.hasMany(Pet, { foreignKey: "typePet" });
+  Pet.belongsTo(TypePet, { foreignKey: "typePet" });
+
+  Breed.hasMany(Pet, { foreignKey: "breed" });
+  Pet.belongsTo(Breed, { foreignKey: "breed" });
 };

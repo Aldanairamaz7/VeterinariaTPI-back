@@ -3,52 +3,57 @@ import { sequelize } from "../db.js";
 
 export const Shift = sequelize.define(
   "Shift",
-   {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull:false, //sino no funciona
-  },
-  dateTime: {
-    type: DataTypes.DATE,
-    allowNull: false,
-  },
-  typeConsult: {
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-  enrollment:{
-    type: DataTypes.INTEGER,
-    allowNull: true, //cuando creemos veterinarian pasar a false
-    references:{
-      model: 'veterinarians',
-      key: 'enrollment'
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false, //sino no funciona
+    },
+    dateTime: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    typeConsult: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    enrollment: {
+      type: DataTypes.INTEGER,
+      allowNull: true, //cuando creemos veterinarian pasar a false
+      references: {
+        model: "veterinarians",
+        key: "enrollment",
+      },
+    },
+    petId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "pets",
+        key: "id",
+      },
+    },
+    userId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      references: {
+        model: "users",
+        key: "id",
+      },
+    },
+    description: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.TEXT,
+      allowNull: false,
+      defaultValue: "Pendiente",
     },
   },
-  petId:{
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references:{
-      model: 'pets',
-      key:'id',
-    },
-  },
-  userId:{
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references:{
-      model: 'users',
-      key:'id',
-    },
-  },
-  description:{
-    type: DataTypes.TEXT,
-    allowNull: true,
-  },
-},
-{
+  {
     timestamps: false,
-    tableName: 'shifts'
-  },
+    tableName: "shifts",
+  }
 );

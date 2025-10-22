@@ -50,10 +50,12 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      //idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
+      //  idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
     });
 
-    return res.status(201).json({ newUser });
+    return res
+      .status(201)
+      .json({ message: "¡Usuario creado con exito!", newUser });
   } catch (error) {
     console.error("Error en registro:", error);
     return res.status(500).json({ message: "Error interno del servidor" });
@@ -217,6 +219,7 @@ export const editProfile = async (req, res) => {
     }
 
     user.idRole = idRole;
+    let message = "Usuario actualizado correctamente";
 
     if (idRole === 2) {
       if (!enrollment) {
@@ -250,8 +253,7 @@ export const editProfile = async (req, res) => {
           idSpeciality: specialityId,
           userId: targetUserId,
         });
-        if (veterinarian)
-          res.status(200).send({ message: "Veterinario creado con exito" });
+        if (veterinarian) message = "Veterinario creado con exito";
         else {
           res
             .status(500)
@@ -260,7 +262,7 @@ export const editProfile = async (req, res) => {
       } else {
         veterinarian.idSpeciality = specialityId;
 
-        res.status(200).send({ message: "Veterinario actualizado con exito" });
+        message = "Veterinario actualizado con exito";
       }
       await veterinarian.save();
     }
@@ -285,7 +287,7 @@ export const editProfile = async (req, res) => {
     delete updatedUser.password;
 
     res.json({
-      message: "Perfil actualizado correctamente.",
+      message,
       user: updatedUser,
     });
   } catch (error) {

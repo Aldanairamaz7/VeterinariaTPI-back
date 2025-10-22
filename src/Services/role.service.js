@@ -1,23 +1,22 @@
-import { Roles } from "../entities/Roles.js"
+import { Roles } from "../entities/Roles.js";
 
 export const initializationRoles = async () => {
-    const basicRoles = [{
-        idRole: 1,
-        roleSumary: "Usuario"
+  const basicRoles = [
+    {
+      idRole: 1,
+      roleSumary: "Usuario", //cambiar a rolName
     },
     {
-        idRole: 2,
-        roleSumary: "Veterinario"
+      idRole: 2,
+      roleSumary: "Veterinario",
     },
     {
-        idRole: 3,
-        roleSumary: "Admin"
-    }
-]
+      idRole: 3,
+      roleSumary: "Admin",
+    },
+  ];
 
-    await Roles.bulkCreate(basicRoles, {
-    ignoreDuplicates: true, 
-    });
-}
-
-
+  await Roles.bulkCreate(basicRoles, {
+    ignoreDuplicates: true,
+  });
+};

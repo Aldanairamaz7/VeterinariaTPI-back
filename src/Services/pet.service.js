@@ -3,7 +3,48 @@ import { Pet } from "../entities/Pet.js";
 import { TypePet } from "../entities/TypePets.js";
 import { User } from "../entities/User.js";
 
-/* Testear */
+export const initializationTypePet = async () => {
+  const basicTypes = [
+    {
+      idType: 1,
+      typePetName: "Perro",
+    },
+    {
+      idType: 2,
+      typePetName: "Gato",
+    },
+    {
+      idType: 3,
+      typePetName: "Ave",
+    },
+    {
+      idType: 4,
+      typePetName: "Pez",
+    },
+  ];
+
+  await TypePet.bulkCreate(basicTypes, {
+    ignoreDuplicates: true,
+  });
+};
+
+export const getInfo = async (req, res) => {
+  try {
+    const typePet = await TypePet.findAll();
+    if (!typePet)
+      return res
+        .status(404)
+        .send({ message: "no se encontraron las especies" });
+    const breed = await Breed.findAll();
+    if (!breed)
+      return res
+        .status(404)
+        .send({ message: "no se encontraron las especies" });
+
+    res.status(200).send({ breed, typePet });
+  } catch (err) {}
+};
+
 export const getPet = async (req, res) => {
   try {
     const { petId } = req.params;

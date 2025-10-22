@@ -18,6 +18,7 @@ import petRoutes from "./Routes/pet.routes.js";
 import adminRoutes from "./Routes/admin.routes.js";
 import shiftRoutes from "./Routes/shift.routes.js";
 import { initializationRoles } from "./Services/role.service.js";
+import { initializationTypePet } from "./Services/pet.service.js";
 
 defineAssociations();
 
@@ -44,6 +45,7 @@ async function startServer() {
       console.log(`Servidor escuchando en http://localhost:${PORT}`);
     });
     initializationRoles();
+    initializationTypePet();
   } catch (err) {
     console.error("Error durante el inicio:", err);
     process.exit(1);
