@@ -10,8 +10,9 @@ import "./entities/Veterinarian.js";
 import "./entities/Roles.js";
 import "./entities/Speciality.js";
 import "./entities/TypePets.js";
+import "./entities/Breed.js";
 
-import { defineAssociations } from "./entities/associations.js"; // Ajusta la ruta según tu estructura
+import { defineAssociations } from "./entities/associations.js";
 import userRoutes from "./Routes/user.routes.js";
 import petRoutes from "./Routes/pet.routes.js";
 import adminRoutes from "./Routes/admin.routes.js";

@@ -5,6 +5,8 @@ import { Pet } from "./Pet.js";
 import { Shift } from "./Shift.js";
 import { Roles } from "./Roles.js";
 import { Speciality } from "./Speciality.js";
+import { TypePet } from "./TypePets.js";
+import { Breed } from "./Breed.js";
 
 export const defineAssociations = () => {
   User.hasMany(Pet, { foreignKey: "userId", onDelete: "CASCADE", as: "pets" });
@@ -29,10 +31,12 @@ export const defineAssociations = () => {
   User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
 
   Speciality.hasMany(Veterinarian, {
-    foreignKey: "idSpeciality"
+    foreignKey: "idSpeciality",
   });
   Veterinarian.belongsTo(Speciality, {
     foreignKey: "idSpeciality",
     as: "speciality",
   });
+  TypePet.hasMany(Breed, { foreignKey: "idTypePet" });
+  Breed.belongsTo(TypePet, { foreignKey: "idTypePet" });
 };

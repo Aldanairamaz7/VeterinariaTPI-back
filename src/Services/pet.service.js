@@ -1,4 +1,6 @@
+import { Breed } from "../entities/Breed.js";
 import { Pet } from "../entities/Pet.js";
+import { TypePet } from "../entities/TypePets.js";
 import { User } from "../entities/User.js";
 
 /* Testear */
@@ -21,9 +23,16 @@ export const getPet = async (req, res) => {
 
     if (!pet) return res.status(404).json({ message: "Macota no encontrada" });
 
+    const typePets = await TypePet.findAll();
+    if (!typePets)
+      return (404).json({ message: "no se encontraron tipos de mascota" });
+    const breed = await Breed.findAll();
+    if (!breed)
+      return res.status(404).json({ message: "no se encotro ninguna raza" });
+
     return res
       .status(200)
-      .send({ message: "mascota encontrada con exito", pet });
+      .send({ message: "mascota encontrada con exito", pet, typePets, breed });
   } catch (error) {
     res.status(500).json({ message: "Error interno del servidor", error });
   }
@@ -163,7 +172,6 @@ export const removePet = async (req, res) => {
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
-
 /* export const removePet = async (req, res) =>{
     try{
         const {name, age, breed, imageURL } = req.body
