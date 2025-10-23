@@ -6,6 +6,8 @@ import { Veterinarian } from "../entities/Veterinarian.js";
 import { validateEmail, validatePassword } from "../utils/validations.js";
 import { Roles } from "../entities/Roles.js";
 import { Speciality } from "../entities/Speciality.js";
+import { TypePet } from "../entities/TypePets.js";
+import { Breed } from "../entities/Breed.js";
 
 export const register = async (req, res) => {
   try {
@@ -99,12 +101,7 @@ export const login = async (req, res) => {
 
   return res.json({
     token,
-    user: {
-      id: user.id,
-      firstName: user.firstName,
-      email: user.email,
-      idRole: user.idRole,
-    },
+    user,
   });
 };
 
@@ -134,23 +131,46 @@ export const authenticateToken = async (req, res, next) => {
 
 export const addPet = async (req, res) => {
   try {
-    const { name, age, imageURL, typePetSelect, otherType, breedSelect, otherBreed } = req.body;
+    const {
+      name,
+      age,
+      imageURL,
+      typePetSelect,
+      otherType,
+      breedSelect,
+      otherBreed,
+    } = req.body;
 
-    if (!name || !age || !typePetSelect || !otherType || !breedSelect || !otherBreed) {
-      return res
-        .status(400)
-        .json({ message: "Faltan completar algunos campos obligatorios" });
+    let newTypeId;
+    let newBreedId;
+    if (Number(typePetSelect) === 0 && otherType !== "") {
+      const typePet = await TypePet.create({
+        typePetName: otherType,
+      });
+      if (!typePet)
+        return res.status(500).send({ message: "no se pudo crear la especie" });
+      newTypeId = typePet.idType;
+    }
+    if (Number(breedSelect) === 0 && otherBreed !== "") {
+      const breed = await Breed.create({
+        nameBreed: otherBreed,
+        idTypePet: typePetSelect !== 0 ? typePetSelect : newTypeId,
+      });
+      if (!breed)
+        return res.status(500).send({ message: "no se pudo crear la raza" });
+      newBreedId = breed.idBreed;
     }
 
     const newPet = await Pet.create({
       name,
       age,
-      breed,
+      typePet: Number(typePetSelect) !== 0 ? typePetSelect : newTypeId,
+      breed: Number(breedSelect) !== 0 ? breedSelect : newBreedId,
       imageURL,
       userId: req.user.id,
     });
 
-    res.status(201).json(newPet);
+    res.status(200).json({ newPet });
   } catch (error) {
     console.error("Error al agregar mascota", error);
     res.status(500).json({ message: "Error del servidor" });
@@ -272,16 +292,16 @@ export const editProfile = async (req, res) => {
       await delVet.destroy();
     }
     const currentFirstName = user.firstName;
-    if(!currentFirstName) user.firstName = currentFirstName;
-    
+    if (!currentFirstName) user.firstName = currentFirstName;
+
     const currentLastName = user.lastName;
-    if(!lastName) user.lastName = currentLastName;
+    if (!lastName) user.lastName = currentLastName;
 
     const currentDni = user.dni;
-    if(!dni) user.dni = currentDni;
+    if (!dni) user.dni = currentDni;
 
     const currentEmail = user.email;
-    if(!email) user.email = currentEmail
+    if (!email) user.email = currentEmail;
 
     const currentPasword = user.password;
     if (!password) user.password = currentPasword;

@@ -17,7 +17,7 @@ export const Pet = sequelize.define(
       type: DataTypes.INTEGER,
     },
     breed: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: "breed",
@@ -25,7 +25,7 @@ export const Pet = sequelize.define(
       },
     },
     typePet: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.INTEGER,
       allowNull: false,
       references: {
         model: "typePet",
