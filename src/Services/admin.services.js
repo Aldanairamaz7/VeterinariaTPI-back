@@ -45,16 +45,27 @@ export const adminDeleteUser = async (req, res) => {
 
 export const adminGetUserPets = async (req, res) => {
   const { id } = req.params;
+
   if (!id)
     return res.status(400).send({
       message: "Es necesario una id de usuario para buscar las mascotas",
     });
-  const pets = await Pet.findAll({
+    
+  const user = await User.findByPk( id, {
+    attributes: ["id", "firstName", "lastName"]
+  })
+
+  if(!user){
+    return res.status(404).json({message: "Usuario no encontrado"})
+  }
+
+    const pets = await Pet.findAll({
     where: { userId: id },
   });
+
   if (!pets)
     return res.status(404).send({ message: "Mascotas no encontradas" });
-  res.status(200).send({ message: "Mascota/s encontrada/s con exito", pets });
+  res.status(200).send({ message: "Mascota/s encontrada/s con exito", user, pets });
 };
 
 export const adminGetAllPets = async (req, res) => {
