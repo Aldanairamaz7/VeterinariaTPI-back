@@ -1,6 +1,5 @@
 import express from "express";
 import { PORT } from "./config.js";
-import router from "./Routes/routes.js";
 import { sequelize } from "./db.js";
 
 import "./entities/User.js";
@@ -34,7 +33,6 @@ async function startServer() {
       next();
     });
 
-    app.use(router);
     app.use(userRoutes);
     app.use(petRoutes);
     app.use(adminRoutes);

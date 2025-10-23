@@ -134,9 +134,9 @@ export const authenticateToken = async (req, res, next) => {
 
 export const addPet = async (req, res) => {
   try {
-    const { name, age, breed, imageURL } = req.body;
+    const { name, age, imageURL, typePetSelect, otherType, breedSelect, otherBreed } = req.body;
 
-    if (!name || !age || !breed) {
+    if (!name || !age || !typePetSelect || !otherType || !breedSelect || !otherBreed) {
       return res
         .status(400)
         .json({ message: "Faltan completar algunos campos obligatorios" });
@@ -271,6 +271,17 @@ export const editProfile = async (req, res) => {
       const delVet = await Veterinarian.findByPk(enrollment);
       await delVet.destroy();
     }
+    const currentFirstName = user.firstName;
+    if(!currentFirstName) user.firstName = currentFirstName;
+    
+    const currentLastName = user.lastName;
+    if(!lastName) user.lastName = currentLastName;
+
+    const currentDni = user.dni;
+    if(!dni) user.dni = currentDni;
+
+    const currentEmail = user.email;
+    if(!email) user.email = currentEmail
 
     const currentPasword = user.password;
     if (!password) user.password = currentPasword;
