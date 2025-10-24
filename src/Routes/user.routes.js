@@ -9,6 +9,8 @@ import {
 } from "../Services/user.service.js";
 import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
+import { Breed } from "../entities/Breed.js";
+import { TypePet } from "../entities/TypePets.js";
 
 const userRoutes = Router();
 
@@ -23,6 +25,18 @@ userRoutes.get("/user/me", authenticateToken, async (req, res) => {
         {
           model: Pet,
           as: "pets",
+          where:{ isActive: true},
+          required: false,
+          include:[
+            {
+              model: Breed,
+              as: 'breedData'
+            },
+            {
+              model: TypePet,
+              as: 'typePetData'
+            }
+          ]
         },
       ],
     });

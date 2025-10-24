@@ -36,6 +36,11 @@ export const User = sequelize.define(
       allowNull: false,
       defaultValue: 1,
     },
+    isActive:{
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
+    }
   },
   { timestamps: false, tableName: "users" }
 );

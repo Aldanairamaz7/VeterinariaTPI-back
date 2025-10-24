@@ -14,7 +14,7 @@ export const register = async (req, res) => {
     const { firstName, lastName, dni, email, password } = req.body;
 
     let user = await User.findOne({
-      where: { email },
+      where: { email, isActive: true },
     });
 
     if (user) {
@@ -24,7 +24,7 @@ export const register = async (req, res) => {
     }
 
     user = await User.findOne({
-      where: { dni },
+      where: { dni , isActive: true},
     });
 
     if (user) {
@@ -53,6 +53,7 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       //  idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
+      isActive: true
     });
 
     return res
@@ -77,11 +78,13 @@ export const login = async (req, res) => {
     return res.status(401).send({ message: "Contraseña invalida" });
 
   const user = await User.findOne({
-    where: { email },
+    where: { email , isActive: true},
     include: [
       {
         model: Pet,
         as: "pets",
+        where:{isActive: true},
+        required:false
       },
     ],
   });
@@ -116,7 +119,9 @@ export const authenticateToken = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, secretKey);
-    const user = await User.findByPk(decoded.id);
+    const user = await User.findOne({
+      where:{id: decoded.id, isActive: true}
+    });
 
     if (!user)
       return res.status(404).json({ message: "Usuario no encontrado" });
@@ -161,15 +166,30 @@ export const addPet = async (req, res) => {
       newBreedId = breed.idBreed;
     }
 
-    const newPet = await Pet.create({
+    const newPetCreated = await Pet.create({
       name,
       age,
       typePet: Number(typePetSelect) !== 0 ? typePetSelect : newTypeId,
       breed: Number(breedSelect) !== 0 ? breedSelect : newBreedId,
       imageURL,
       userId: req.user.id,
+      isActive: true
     });
 
+    const newPet = await Pet.findByPk(newPetCreated.id, {
+      include: [
+        {
+          model: Breed,
+          as: "breedData",
+          /* attributes: ["idBreed", "nameBreed"], */
+        },
+        {
+          model: TypePet,
+          as: "typePetData",
+          /* attributes: ["idTypePet", "typePetName"], */
+        },
+      ],
+    })
     res.status(200).json({ newPet });
   } catch (error) {
     console.error("Error al agregar mascota", error);
@@ -204,13 +224,17 @@ export const editProfile = async (req, res) => {
         "email",
         "password",
         "idRole",
+        "isActive"
       ],
       include: [
         {
           model: Pet,
           as: "pets",
+          where:{isActive: true},
+          required: false
         },
       ],
+      where:{isActive: true}
     });
 
     if (!user) {
@@ -332,6 +356,7 @@ export const editGetUser = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(404).send({ message: "se necesita una id" });
     const user = await User.findByPk(userId, {
+      where:{isActive: true},
       include: {
         model: Veterinarian,
         as: "veterinarian",

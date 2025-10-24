@@ -44,6 +44,11 @@ export const Pet = sequelize.define(
         key: "id",
       },
     },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true
+    }
   },
   {
     timestamps: false,
