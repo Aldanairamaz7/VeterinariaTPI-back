@@ -91,6 +91,16 @@ export const editPet = async (req, res) => {
         {
           model: Pet,
           as: "pets",
+          include:[
+            {
+              model: Breed,
+              as: 'breedData'
+            },
+            {
+              model: TypePet,
+              as: 'typePetData'
+            }
+          ]
         },
       ],
     });
@@ -137,6 +147,17 @@ export const editPet = async (req, res) => {
         {
           model: Pet,
           as: "pets",
+          include:[
+            {
+              model: Breed,
+              as: 'breedData'
+            },
+            {
+              model: TypePet,
+              as: 'typePetData'
+            }
+          ]
+
         },
       ],
     });
@@ -194,13 +215,26 @@ export const removePet = async (req, res) => {
       return res.status(404).json({ message: "Mascota no encontrada." });
     }
 
-    await pet.destroy();
+    pet.isActive = false
+    await pet.save();
 
     const updatedUser = await User.findByPk(req.user.id, {
       include: [
         {
           model: Pet,
           as: "pets",
+          where:{isActive: true},
+          required: false,
+          include:[
+            {
+              model: Breed,
+              as: 'breedData'
+            },
+            {
+              model: TypePet,
+              as: 'typePetData'
+            }
+          ]
         },
       ],
     });
@@ -213,35 +247,4 @@ export const removePet = async (req, res) => {
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
-/* export const removePet = async (req, res) =>{
-    try{
-        const {name, age, breed, imageURL } = req.body
 
-        const user = await User.findByPk(req.user.id, {
-                    attributes: ["id", "firstName", "lastName", "dni", "email", "password"],
-                    include:[
-                        {
-                            model: Pet,
-                            as:'pets'
-                        }
-                    ]
-                });
-        
-        if (user){
-            const deletedPet = Pet.drop({
-                id,
-                name,
-                age,
-                breed,
-                imageURL,
-                userId: user.id
-            })
-        }
-
-        return res.status(200).json({ deletedPet })
-
-    }catch(error){
-      console.log("Error al eliminar la mascota", error);
-      res.status(500).json({ message: "Error interno del servidor" });
-    }
-} */
