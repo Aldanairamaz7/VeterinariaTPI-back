@@ -25,18 +25,18 @@ userRoutes.get("/user/me", authenticateToken, async (req, res) => {
         {
           model: Pet,
           as: "pets",
-          where:{ isActive: true},
+          where: { isActive: true },
           required: false,
-          include:[
+          include: [
             {
               model: Breed,
-              as: 'breedData'
+              as: "breedData",
             },
             {
               model: TypePet,
-              as: 'typePetData'
-            }
-          ]
+              as: "typePetData",
+            },
+          ],
         },
       ],
     });

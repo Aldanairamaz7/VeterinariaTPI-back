@@ -24,7 +24,7 @@ export const register = async (req, res) => {
     }
 
     user = await User.findOne({
-      where: { dni , isActive: true},
+      where: { dni, isActive: true },
     });
 
     if (user) {
@@ -53,7 +53,7 @@ export const register = async (req, res) => {
       email,
       password: hashedPassword,
       //  idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
-      isActive: true
+      isActive: true,
     });
 
     return res
@@ -78,13 +78,13 @@ export const login = async (req, res) => {
     return res.status(401).send({ message: "Contraseña invalida" });
 
   const user = await User.findOne({
-    where: { email , isActive: true},
+    where: { email, isActive: true },
     include: [
       {
         model: Pet,
         as: "pets",
-        where:{isActive: true},
-        required:false
+        where: { isActive: true },
+        required: false,
       },
     ],
   });
@@ -120,7 +120,7 @@ export const authenticateToken = async (req, res, next) => {
   try {
     const decoded = jwt.verify(token, secretKey);
     const user = await User.findOne({
-      where:{id: decoded.id, isActive: true}
+      where: { id: decoded.id, isActive: true },
     });
 
     if (!user)
@@ -173,7 +173,7 @@ export const addPet = async (req, res) => {
       breed: Number(breedSelect) !== 0 ? breedSelect : newBreedId,
       imageURL,
       userId: req.user.id,
-      isActive: true
+      isActive: true,
     });
 
     const newPet = await Pet.findByPk(newPetCreated.id, {
@@ -189,8 +189,8 @@ export const addPet = async (req, res) => {
           /* attributes: ["idTypePet", "typePetName"], */
         },
       ],
-    })
-    res.status(200).json({ newPet });
+    });
+    res.status(200).json({ message: "Mascota creada con exito", newPet });
   } catch (error) {
     console.error("Error al agregar mascota", error);
     res.status(500).json({ message: "Error del servidor" });
@@ -224,17 +224,17 @@ export const editProfile = async (req, res) => {
         "email",
         "password",
         "idRole",
-        "isActive"
+        "isActive",
       ],
       include: [
         {
           model: Pet,
           as: "pets",
-          where:{isActive: true},
-          required: false
+          where: { isActive: true },
+          required: false,
         },
       ],
-      where:{isActive: true}
+      where: { isActive: true },
     });
 
     if (!user) {
@@ -356,7 +356,7 @@ export const editGetUser = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(404).send({ message: "se necesita una id" });
     const user = await User.findByPk(userId, {
-      where:{isActive: true},
+      where: { isActive: true },
       include: {
         model: Veterinarian,
         as: "veterinarian",

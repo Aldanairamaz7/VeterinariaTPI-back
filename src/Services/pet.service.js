@@ -64,16 +64,19 @@ export const getPet = async (req, res) => {
 
     if (!pet) return res.status(404).json({ message: "Macota no encontrada" });
 
-    const typePets = await TypePet.findAll();
-    if (!typePets)
+    const allTypePet = await TypePet.findAll();
+    if (!allTypePet)
       return (404).json({ message: "no se encontraron tipos de mascota" });
-    const breed = await Breed.findAll();
-    if (!breed)
+    const allBreed = await Breed.findAll();
+    if (!allBreed)
       return res.status(404).json({ message: "no se encotro ninguna raza" });
 
-    return res
-      .status(200)
-      .send({ message: "mascota encontrada con exito", pet, typePets, breed });
+    return res.status(200).send({
+      message: "mascota encontrada con exito",
+      pet,
+      allTypePet,
+      allBreed,
+    });
   } catch (error) {
     res.status(500).json({ message: "Error interno del servidor", error });
   }
@@ -81,7 +84,18 @@ export const getPet = async (req, res) => {
 
 export const editPet = async (req, res) => {
   try {
-    const { id, name, age, breed, imageURL } = req.body;
+    const { pet } = req.body;
+    const {
+      id,
+      petName,
+      petAge,
+      typePet,
+      otherTypePet,
+      breed,
+      otherBreed,
+      imageURL,
+    } = pet;
+
     if (!id) {
       return res.status(400).json({ message: "ID de la mascota es requerido" });
     }
@@ -91,47 +105,67 @@ export const editPet = async (req, res) => {
         {
           model: Pet,
           as: "pets",
-          include:[
+          include: [
             {
               model: Breed,
-              as: 'breedData'
+              as: "breedData",
             },
             {
               model: TypePet,
-              as: 'typePetData'
-            }
-          ]
+              as: "typePetData",
+            },
+          ],
         },
       ],
     });
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
     }
-    let pet;
+    let findedPet;
     if (user.idRole < 2) {
-      pet = await Pet.findOne({
+      findedPet = await Pet.findOne({
         where: {
           id,
-          userId: user.id, //quitar para modificar mascota como admin
+          userId: user.id,
         },
       });
     } else {
-      pet = await Pet.findOne({
+      findedPet = await Pet.findOne({
         where: {
           id,
         },
       });
     }
 
-    if (!pet) {
+    if (!findedPet) {
       return res.status(404).json({ message: "Mascota no encontrada" });
     }
+    let typePetData;
+    let breedData;
+    if (typePet === 0) {
+      typePetData = await TypePet.create({
+        typePetName: otherTypePet,
+      });
+      if (!typePetData)
+        return res.status(500).send({ message: "no se pudo crear la especie" });
+    }
+
+    if (breed === 0) {
+      breedData = await Breed.create({
+        nameBreed: otherBreed,
+        idTypePet: typePetData.idType,
+      });
+      if (!breedData)
+        return res.status(500).send({ message: "no se pudo crear la raza" });
+    }
+
     await Pet.update(
       {
-        name,
-        age,
-        breed,
-        imageURL,
+        name: !petName ? findedPet.name : petName,
+        age: !petAge ? findedPet.age : petAge,
+        typePet: typePet === 0 ? typePetData.idType : typePet,
+        breed: breed === 0 ? breedData.idBreed : breed,
+        imageURL: !imageURL ? findedPet.imageURL : imageURL,
       },
       {
         where: {
@@ -147,17 +181,16 @@ export const editPet = async (req, res) => {
         {
           model: Pet,
           as: "pets",
-          include:[
+          include: [
             {
               model: Breed,
-              as: 'breedData'
+              as: "breedData",
             },
             {
               model: TypePet,
-              as: 'typePetData'
-            }
-          ]
-
+              as: "typePetData",
+            },
+          ],
         },
       ],
     });
@@ -215,7 +248,7 @@ export const removePet = async (req, res) => {
       return res.status(404).json({ message: "Mascota no encontrada." });
     }
 
-    pet.isActive = false
+    pet.isActive = false;
     await pet.save();
 
     const updatedUser = await User.findByPk(req.user.id, {
@@ -223,18 +256,18 @@ export const removePet = async (req, res) => {
         {
           model: Pet,
           as: "pets",
-          where:{isActive: true},
+          where: { isActive: true },
           required: false,
-          include:[
+          include: [
             {
               model: Breed,
-              as: 'breedData'
+              as: "breedData",
             },
             {
               model: TypePet,
-              as: 'typePetData'
-            }
-          ]
+              as: "typePetData",
+            },
+          ],
         },
       ],
     });
@@ -247,4 +280,3 @@ export const removePet = async (req, res) => {
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
-
