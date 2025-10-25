@@ -4,6 +4,8 @@ import { Pet } from "../entities/Pet.js";
 import { Op } from "sequelize";
 import { Speciality } from "../entities/Speciality.js";
 import { Veterinarian } from "../entities/Veterinarian.js";
+import { Breed } from "../entities/Breed.js";
+import { TypePet } from "../entities/TypePets.js";
 
 export const createShift = async (req, res) => {
   try {
@@ -99,13 +101,29 @@ export const historyShift = async (req, res) => {
 };
 export const checkoutShift = async (req, res) => {
   const { userId } = req.params;
+
   try {
     const shifts = await Shift.findAll({
       where: { userId },
       include: [
         {
           model: Pet,
-          attributes: ["id", "name", "breed"],
+          as:'pet',
+          attributes: ["id", "name", "breed", "typePet"],
+          include: [
+            {
+              model: Breed,
+              as: "breedData",
+              attributes: ["nameBreed"],
+              required: false
+            },
+            {
+              model: TypePet,
+              as: "typePetData",
+              attributes: ["typePetName"],
+              required: false,
+            },
+          ],
         },
       ],
       order: [["dateTime", "DESC"]],
@@ -116,12 +134,14 @@ export const checkoutShift = async (req, res) => {
       dateTime: shift.dateTime,
       typeConsult: shift.typeConsult,
       description: shift.description,
-      petName: shift.Pet.name,
-      breed: shift.Pet.breed,
+      petName: shift.pet?.name || "Sin mascota",
+      breed: shift.pet?.breedData?.nameBreed || "Sin raza",
+      typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
     }));
 
-    res.json(formatedShift);
+    res.status(200).json(formatedShift);
   } catch (error) {
+    console.error("Error en checkoutShift:", error);
     res.status(500).json({ error: "Error al obtener turnos" });
   }
 };

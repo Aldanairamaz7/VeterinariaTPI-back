@@ -16,16 +16,16 @@ export const defineAssociations = () => {
   Veterinarian.belongsTo(User, { foreignKey: "userId", as: "veterinarian" });
 
   Pet.hasMany(Shift, { foreignKey: "petId", onDelete: "CASCADE" });
-  Shift.belongsTo(Pet, { foreignKey: "petId" });
+  Shift.belongsTo(Pet, { foreignKey: "petId", as: 'pet' });
 
   User.hasMany(Shift, { foreignKey: "userId", onDelete: "CASCADE" });
-  Shift.belongsTo(User, { foreignKey: "userId" });
+  Shift.belongsTo(User, { foreignKey: "userId" , as: 'client'});
 
   Veterinarian.hasMany(Shift, {
     foreignKey: "enrollment",
     onDelete: "CASCADE",
   });
-  Shift.belongsTo(Veterinarian, { foreignKey: "enrollment" });
+  Shift.belongsTo(Veterinarian, { foreignKey: "enrollment", as: 'veterinarian'});
 
   Roles.hasMany(User, { foreignKey: "idRole", onDelete: "CASCADE" });
   User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
