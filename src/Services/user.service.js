@@ -52,7 +52,7 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      //idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
+      idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
       isActive: true,
     });
 
@@ -103,6 +103,7 @@ export const login = async (req, res) => {
   });
 
   return res.json({
+    message: "Bienvenido a VetCare",
     token,
     user,
   });
