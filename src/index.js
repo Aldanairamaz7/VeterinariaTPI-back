@@ -16,6 +16,7 @@ import userRoutes from "./Routes/user.routes.js";
 import petRoutes from "./Routes/pet.routes.js";
 import adminRoutes from "./Routes/admin.routes.js";
 import shiftRoutes from "./Routes/shift.routes.js";
+import veterinarianRoutes from "./Routes/veterinarian.routes.js"
 import { initializationRoles } from "./Services/role.service.js";
 import { initializationTypePet } from "./Services/pet.service.js";
 
@@ -37,6 +38,7 @@ async function startServer() {
     app.use(petRoutes);
     app.use(adminRoutes);
     app.use(shiftRoutes);
+    app.use(veterinarianRoutes)
     await sequelize.sync();
 
     app.listen(PORT, () => {
