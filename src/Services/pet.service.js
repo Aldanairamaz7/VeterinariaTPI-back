@@ -1,5 +1,6 @@
 import { Breed } from "../entities/Breed.js";
 import { Pet } from "../entities/Pet.js";
+import { Shift } from "../entities/Shift.js";
 import { TypePet } from "../entities/TypePets.js";
 import { User } from "../entities/User.js";
 
@@ -153,7 +154,7 @@ export const editPet = async (req, res) => {
     if (breed === 0) {
       breedData = await Breed.create({
         nameBreed: otherBreed,
-        idTypePet: typePetData.idType,
+        idTypePet: typePet === 0 ? typePetData.idType : typePet,
       });
       if (!breedData)
         return res.status(500).send({ message: "no se pudo crear la raza" });
@@ -248,8 +249,17 @@ export const removePet = async (req, res) => {
       return res.status(404).json({ message: "Mascota no encontrada." });
     }
 
-    pet.isActive = false;
-    await pet.save();
+    const shift = await Shift.count({
+      where: {
+        petId: pet.id,
+      },
+    });
+    if (shift <= 0) {
+      pet.destroy();
+    } else {
+      pet.isActive = false;
+      await pet.save();
+    }
 
     const updatedUser = await User.findByPk(req.user.id, {
       include: [
@@ -272,9 +282,11 @@ export const removePet = async (req, res) => {
       ],
     });
 
-    return res
-      .status(200)
-      .json({ message: "Mascota eliminada con exito.", user: updatedUser });
+    return res.status(200).json({
+      message: "Mascota eliminada con exito.",
+      user: updatedUser,
+      shift,
+    });
   } catch (error) {
     console.error("Error al eliminar mascota", error);
     return res.status(500).json({ message: "Error interno del servidor." });

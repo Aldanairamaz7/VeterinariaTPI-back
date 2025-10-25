@@ -14,7 +14,7 @@ const shiftRoutes = Router();
 shiftRoutes.post("/shift", authenticateToken, createShift);
 shiftRoutes.get("/misturnos", authenticateToken, historyShift);
 shiftRoutes.get("/:userId/misturnos", authenticateToken, checkoutShift);
-shiftRoutes.delete("/shifts/:id", authenticateToken, cancelShift);
+shiftRoutes.put("/shifts/:id/:userId", authenticateToken, cancelShift);
 shiftRoutes.get("/requestshift", authenticateToken, getSpeciality);
 
 export default shiftRoutes;

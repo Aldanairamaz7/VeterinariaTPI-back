@@ -108,14 +108,14 @@ export const checkoutShift = async (req, res) => {
       include: [
         {
           model: Pet,
-          as:'pet',
+          as: "pet",
           attributes: ["id", "name", "breed", "typePet"],
           include: [
             {
               model: Breed,
               as: "breedData",
               attributes: ["nameBreed"],
-              required: false
+              required: false,
             },
             {
               model: TypePet,
@@ -134,9 +134,10 @@ export const checkoutShift = async (req, res) => {
       dateTime: shift.dateTime,
       typeConsult: shift.typeConsult,
       description: shift.description,
-      petName: shift.pet?.name || "Sin mascota",
+      name: shift.pet?.name || "Sin mascota",
       breed: shift.pet?.breedData?.nameBreed || "Sin raza",
       typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
+      state: shift.state,
     }));
 
     res.status(200).json(formatedShift);
@@ -149,6 +150,7 @@ export const checkoutShift = async (req, res) => {
 export const cancelShift = async (req, res) => {
   const { id } = req.params;
   const userIdFromToken = req.user.id;
+  const { userId } = req.params;
 
   try {
     const shift = await Shift.findByPk(id);
@@ -162,8 +164,48 @@ export const cancelShift = async (req, res) => {
         .json({ message: "No tiene permiso para cancelar el turno" });
     }
 
-    await shift.destroy();
-    return res.status(200).json({ message: "Turno cancelado con exito." });
+    shift.state = "Cancelado";
+    await shift.save();
+
+    const allShift = await Shift.findAll({
+      where: { userId },
+      include: [
+        {
+          model: Pet,
+          as: "pet",
+          attributes: ["id", "name", "breed", "typePet"],
+          include: [
+            {
+              model: Breed,
+              as: "breedData",
+              attributes: ["nameBreed"],
+              required: false,
+            },
+            {
+              model: TypePet,
+              as: "typePetData",
+              attributes: ["typePetName"],
+              required: false,
+            },
+          ],
+        },
+      ],
+      order: [["dateTime", "DESC"]],
+    });
+    const formatedShift = allShift.map((shift) => ({
+      id: shift.id,
+      dateTime: shift.dateTime,
+      typeConsult: shift.typeConsult,
+      description: shift.description,
+      name: shift.pet?.name || "Sin mascota",
+      breed: shift.pet?.breedData?.nameBreed || "Sin raza",
+      typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
+      state: shift.state,
+    }));
+
+    return res
+      .status(200)
+      .json({ message: "Turno cancelado con exito.", formatedShift });
   } catch (err) {
     return res.status(500).json({ error: "Error interno del servidor." });
   }
