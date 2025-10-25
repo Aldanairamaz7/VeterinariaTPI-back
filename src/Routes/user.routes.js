@@ -11,6 +11,9 @@ import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { Breed } from "../entities/Breed.js";
 import { TypePet } from "../entities/TypePets.js";
+import { Speciality } from "../entities/Speciality.js";
+import { Shift } from "../entities/Shift.js";
+import { Veterinarian } from "../entities/Veterinarian.js";
 
 const userRoutes = Router();
 
@@ -40,6 +43,34 @@ userRoutes.get("/user/me", authenticateToken, async (req, res) => {
         },
       ],
     });
+
+    if (user.idRole === 2) {
+      const veterinarian = await Veterinarian.findOne({
+        where: { userId: user.id },
+        include: [
+          { model: Speciality, as: "speciality" },
+          {
+            model: Shift,
+            include: [
+              {
+                model: Pet,
+                as: "pet",
+                include: [
+                  { association: "typePetData" },
+                  { association: "breedData" },
+                ],
+              },
+              { model: User, as: "client" },
+            ],
+          },
+        ],
+      });
+
+      return res.json({
+        user,
+        veterinarian
+      });
+    }
 
     if (!user) {
       return res.status(404).json({ message: "Usuario no encontrado" });
