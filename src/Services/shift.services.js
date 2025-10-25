@@ -150,7 +150,8 @@ export const checkoutShift = async (req, res) => {
 export const cancelShift = async (req, res) => {
   const { id } = req.params;
   const userIdFromToken = req.user.id;
-  const { userId } = req.params;
+  const { userId} = req.params;
+    
 
   try {
     const shift = await Shift.findByPk(id);
@@ -158,7 +159,7 @@ export const cancelShift = async (req, res) => {
       return res.status(404).json({ message: "Turno no encontrado" });
     }
 
-    if (shift.userId !== userIdFromToken) {
+    if (shift.userId !== userIdFromToken  && shift.enrollment !== userIdFromToken) {
       return res
         .status(403)
         .json({ message: "No tiene permiso para cancelar el turno" });

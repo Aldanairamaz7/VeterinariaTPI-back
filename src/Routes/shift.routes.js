@@ -16,5 +16,6 @@ shiftRoutes.get("/misturnos", authenticateToken, historyShift);
 shiftRoutes.get("/:userId/misturnos", authenticateToken, checkoutShift);
 shiftRoutes.put("/shifts/:id/:userId", authenticateToken, cancelShift);
 shiftRoutes.get("/requestshift", authenticateToken, getSpeciality);
+shiftRoutes.put("/shifts/:id", authenticateToken, cancelShift);
 
 export default shiftRoutes;
