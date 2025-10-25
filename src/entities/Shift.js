@@ -11,7 +11,7 @@ export const Shift = sequelize.define(
       allowNull: false, //sino no funciona
     },
     dateTime: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
     },
     typeConsult: {
