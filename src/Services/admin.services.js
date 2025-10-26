@@ -8,6 +8,9 @@ import { Veterinarian } from "../entities/Veterinarian.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
+    where: {
+      isActive: true,
+    },
     attributes: ["id", "firstName", "lastName", "email", "dni", "idRole"],
     include: [
       {
@@ -39,15 +42,42 @@ export const adminDeleteUser = async (req, res) => {
       userId: user.id,
     },
   });
-
+  const pets = await Pet.findAll({
+    where: {
+      userId: user.id,
+    },
+  });
   if (allShift <= 0) {
     await user.destroy();
+    await Promise.all(pets.map((el) => el.destroy()));
   } else {
     user.isActive = false;
+    await Promise.all(
+      pets.map(async (el) => {
+        const allShift = await Shift.findAndCountAll({
+          where: {
+            petId: el.id,
+          },
+        });
+        if (allShift.count <= 0) {
+          await el.destroy();
+        } else {
+          el.isActive = false;
+          allShift.rows.map(async (shift) => {
+            shift.state = "Cancelado";
+            await shift.save();
+          });
+          await el.save();
+        }
+      })
+    );
     await user.save();
   }
 
   const allUsers = await User.findAll({
+    where: {
+      isActive: true,
+    },
     include: [
       {
         model: Roles,
@@ -115,7 +145,6 @@ export const adminGetSpecialities = async (req, res) => {
   res.status(200).send({ message: "especialidades encontradas", specialities });
 };
 
-
 export const adminDeleteSpeciality = async (req, res) => {
   try {
     const { idSpe } = req.params;
@@ -145,7 +174,7 @@ export const adminDeleteSpeciality = async (req, res) => {
       });
     }
 
-  await speciality.destroy();
+    await speciality.destroy();
 
     const specialities = await Speciality.findAll();
 
