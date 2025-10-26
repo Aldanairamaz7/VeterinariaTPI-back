@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { Shift } from "../entities/Shift.js";
 import {
   cancelShift,
   checkoutShift,
@@ -14,8 +13,9 @@ const shiftRoutes = Router();
 shiftRoutes.post("/shift", authenticateToken, createShift);
 shiftRoutes.get("/misturnos", authenticateToken, historyShift);
 shiftRoutes.get("/:userId/misturnos", authenticateToken, checkoutShift);
-shiftRoutes.put("/shifts/:id/:userId", authenticateToken, cancelShift);
 shiftRoutes.get("/requestshift", authenticateToken, getSpeciality);
-shiftRoutes.put("/shifts/:id", authenticateToken, cancelShift);
+
+shiftRoutes.put("/shifts/:id/:userId", authenticateToken, cancelShift);
+shiftRoutes.put("/shifts/:id/:userId", authenticateToken, cancelShift);
 
 export default shiftRoutes;
