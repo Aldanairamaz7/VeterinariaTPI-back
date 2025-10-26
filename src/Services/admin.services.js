@@ -4,6 +4,7 @@ import { Roles } from "../entities/Roles.js";
 import { Speciality } from "../entities/Speciality.js";
 import { Shift } from "../entities/Shift.js";
 import { where } from "sequelize";
+import { Veterinarian } from "../entities/Veterinarian.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
@@ -114,25 +115,48 @@ export const adminGetSpecialities = async (req, res) => {
   res.status(200).send({ message: "especialidades encontradas", specialities });
 };
 
+
 export const adminDeleteSpeciality = async (req, res) => {
-  const { idSpe } = req.params;
-  if (!idSpe)
-    return res
-      .status(404)
-      .send({ message: "Se necesita una id para eliminar la especialidad" });
+  try {
+    const { idSpe } = req.params;
 
-  const speciality = await Speciality.findByPk(idSpe);
+    if (!idSpe) {
+      return res
+        .status(400)
+        .json({ message: "ID de la especialidad es requerido." });
+    }
 
-  if (!speciality)
-    return res.status(404).send({ message: "No se encontro la especialidad" });
+    const speciality = await Speciality.findByPk(idSpe);
+
+    if (!speciality) {
+      return res.status(404).json({ message: "Especialidad no encontrada." });
+    }
+
+    const veterinariansCount = await Veterinarian.count({
+      where: {
+        idSpeciality: idSpe,
+      },
+    });
+
+    if (veterinariansCount > 0) {
+      return res.status(400).json({
+        message: `No se puede eliminar esta especialidad porque tiene ${veterinariansCount} veterinario(s) asociado(s).`,
+        veterinariansCount,
+      });
+    }
 
   await speciality.destroy();
 
-  const specialities = await Speciality.findAll();
+    const specialities = await Speciality.findAll();
 
-  return res
-    .status(200)
-    .send({ message: "Especialidad borrada con exito", specialities });
+    return res.status(200).json({
+      message: "Especialidad eliminada con éxito",
+      specialities,
+    });
+  } catch (error) {
+    console.error("Error al eliminar especialidad:", error);
+    return res.status(500).json({ message: "Error interno del servidor." });
+  }
 };
 
 export const adminGetEditSpe = async (req, res) => {
