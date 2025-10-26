@@ -16,7 +16,7 @@ import {
 const adminRoutes = Router();
 
 adminRoutes.get("/adminpanel/users", authenticateToken, adminGetUser);
-adminRoutes.delete("/users", authenticateToken, adminDeleteUser);
+adminRoutes.put("/users", authenticateToken, adminDeleteUser);
 adminRoutes.get(
   "/adminpanel/users/:id/pets",
   authenticateToken,

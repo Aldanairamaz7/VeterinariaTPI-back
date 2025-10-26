@@ -2,6 +2,8 @@ import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { Roles } from "../entities/Roles.js";
 import { Speciality } from "../entities/Speciality.js";
+import { Shift } from "../entities/Shift.js";
+import { where } from "sequelize";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
@@ -30,7 +32,19 @@ export const adminDeleteUser = async (req, res) => {
   const user = await User.findByPk(idUserDelete);
   if (!user)
     return res.status(404).json({ message: "No se encontro al usuario" });
-  await user.destroy();
+
+  const allShift = await Shift.count({
+    where: {
+      userId: user.id,
+    },
+  });
+
+  if (allShift <= 0) {
+    await user.destroy();
+  } else {
+    user.isActive = false;
+    await user.save();
+  }
 
   const allUsers = await User.findAll({
     include: [
@@ -50,22 +64,24 @@ export const adminGetUserPets = async (req, res) => {
     return res.status(400).send({
       message: "Es necesario una id de usuario para buscar las mascotas",
     });
-    
-  const user = await User.findByPk( id, {
-    attributes: ["id", "firstName", "lastName"]
-  })
 
-  if(!user){
-    return res.status(404).json({message: "Usuario no encontrado"})
+  const user = await User.findByPk(id, {
+    attributes: ["id", "firstName", "lastName"],
+  });
+
+  if (!user) {
+    return res.status(404).json({ message: "Usuario no encontrado" });
   }
 
-    const pets = await Pet.findAll({
+  const pets = await Pet.findAll({
     where: { userId: id },
   });
 
   if (!pets)
     return res.status(404).send({ message: "Mascotas no encontradas" });
-  res.status(200).send({ message: "Mascota/s encontrada/s con exito", user, pets });
+  res
+    .status(200)
+    .send({ message: "Mascota/s encontrada/s con exito", user, pets });
 };
 
 export const adminGetAllPets = async (req, res) => {
