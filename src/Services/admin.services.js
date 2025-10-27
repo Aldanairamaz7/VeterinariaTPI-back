@@ -92,7 +92,7 @@ export const adminDeleteUser = async (req, res) => {
         const allShiftPet = await Shift.findAndCountAll({
           where: {
             petId: el.id,
-            state: "Pendiente", //revisar que solo los shift con state en pendiete se cancelen cuando se elimina el usuaurio
+            state: "Pendiente",
           },
         });
         if (allShiftPet.count <= 0) {
