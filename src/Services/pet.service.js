@@ -202,7 +202,6 @@ export const editPet = async (req, res) => {
       pet: updatedPet,
     });
   } catch (error) {
-    console.error("Error al modificar la mascota", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
@@ -288,7 +287,6 @@ export const removePet = async (req, res) => {
       shift,
     });
   } catch (error) {
-    console.error("Error al eliminar mascota", error);
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };
