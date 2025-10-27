@@ -147,8 +147,9 @@ export const checkoutShift = async (req, res) => {
 };
 
 export const cancelShift = async (req, res) => {
-  const { userId, id } = req.params;
+  const { id, userId } = req.params;
   const roleUser = req.user.idRole;
+  const { action } = req.body;
   console.log(id, userId);
 
   try {
@@ -157,9 +158,10 @@ export const cancelShift = async (req, res) => {
       return res.status(404).json({ message: "Turno no encontrado" });
     }
 
-    shift.state = "Cancelado";
+    shift.state = `${action}`;
     await shift.save();
     let allShift;
+    let formatedShift;
     if (roleUser === 2) {
       allShift = await Shift.findAll({
         where: { enrollment: userId },
@@ -177,7 +179,6 @@ export const cancelShift = async (req, res) => {
               {
                 model: TypePet,
                 as: "typePetData",
-
                 required: false,
               },
             ],
@@ -190,6 +191,27 @@ export const cancelShift = async (req, res) => {
         ],
         order: [["dateTime", "DESC"]],
       });
+      formatedShift = allShift.map((shift) => ({
+        id: shift.id,
+        dateTime: shift.dateTime,
+        typeConsult: shift.typeConsult,
+        description: shift.description,
+        pet: {
+          id: shift.pet?.id || null,
+          name: shift.pet?.name || "Sin mascota",
+          breedData: {
+            nameBreed: shift.pet?.breedData?.nameBreed || "Sin raza",
+          },
+          typePetData: {
+            typePetName: shift.pet?.typePetData?.typePetName || "Sin tipo",
+          },
+        },
+        client: {
+          firstName: shift.client?.firstName || "",
+          lastName: shift.client?.lastName || "",
+        },
+        state: shift.state,
+      }));
     } else {
       allShift = await Shift.findAll({
         where: { userId },
@@ -214,33 +236,24 @@ export const cancelShift = async (req, res) => {
         ],
         order: [["dateTime", "DESC"]],
       });
-    }
-
-    const formatedShift = allShift.map((shift) => ({
-      id: shift.id,
-      dateTime: shift.dateTime,
-      typeConsult: shift.typeConsult,
-      description: shift.description,
-      pet: {
-        id: shift.pet?.id || null,
+      formatedShift = allShift.map((shift) => ({
+        id: shift.id,
         name: shift.pet?.name || "Sin mascota",
-        breedData: {
-          nameBreed: shift.pet?.breedData?.nameBreed || "Sin raza",
+        breed: shift.pet?.breedData?.nameBreed || "Sin raza",
+        dateTime: shift.dateTime,
+        typeConsult: shift.typeConsult,
+        description: shift.description,
+        state: shift.state,
+        client: {
+          firstName: shift.client?.firstName || "",
+          lastName: shift.client?.lastName || "",
         },
-        typePetData: {
-          typePetName: shift.pet?.typePetData?.typePetName || "Sin tipo",
-        },
-      },
-      client: {
-        firstName: shift.client.firstName,
-        lastName: shift.client.lastName,
-      },
-      state: shift.state,
-    }));
+      }));
+    }
 
     return res
       .status(200)
-      .json({ message: "Turno cancelado con exito.", formatedShift });
+      .json({ message: `Turno ${action} con exito.`, formatedShift });
   } catch (err) {
     return res.status(500).json({ error: "Error interno del servidor." });
   }
@@ -248,11 +261,20 @@ export const cancelShift = async (req, res) => {
 
 export const getSpeciality = async (req, res) => {
   try {
-    const specialities = await Speciality.findAll();
+    const specialities = await Speciality.findAll({
+      include: [
+        {
+          model: Veterinarian,
+          as: "veterinarians",
+          where: { isActive: true },
+        },
+      ],
+    });
     if (!specialities)
       return res
         .status(404)
         .json({ message: "no se pudo encontarar especialidades" });
+
     const veterinarians = await User.findAll({
       where: { idRole: 2 },
       include: [
