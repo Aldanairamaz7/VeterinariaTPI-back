@@ -3,9 +3,13 @@ import { User } from "../entities/User.js";
 import { Pet } from "../entities/Pet.js";
 import { authenticateToken } from "../Services/user.service.js";
 import {
+  adminDeleteBreed,
   adminDeleteSpeciality,
+  adminDeleteTypePet,
   adminDeleteUser,
+  adminGetAllBreeds,
   adminGetAllPets,
+  adminGetAllTypes,
   adminGetEditSpe,
   adminGetSpecialities,
   adminGetUser,
@@ -37,5 +41,11 @@ adminRoutes.delete(
 
 adminRoutes.get("/editspeciality/:idSpe", authenticateToken, adminGetEditSpe);
 adminRoutes.put("/editspeciality/:idSpe", authenticateToken, adminPutEditSpe);
+
+adminRoutes.get("/adminpanel/breed", authenticateToken, adminGetAllBreeds);
+adminRoutes.delete("/adminpanel/breed/:idBreed", authenticateToken, adminDeleteBreed)
+
+adminRoutes.get("/adminpanel/typePet", authenticateToken, adminGetAllTypes)
+adminRoutes.delete("/adminpanel/typePet/:idType", authenticateToken, adminDeleteTypePet)
 
 export default adminRoutes;
