@@ -94,7 +94,7 @@ export const adminDeleteUser = async (req, res) => {
         const allShiftPet = await Shift.findAndCountAll({
           where: {
             petId: el.id,
-            state: "Pendiente",
+            state: "Pendiente", //revisar que solo los shift con state en pendiete se cancelen cuando se elimina el usuaurio
           },
         });
         if (allShiftPet.count <= 0) {
@@ -162,10 +162,11 @@ export const adminGetAllPets = async (req, res) => {
       {
         model: User,
         as: "user",
-      },{
+      },
+      {
         model: Breed,
-        as: 'breedData'
-      }
+        as: "breedData",
+      },
     ],
   });
 
@@ -266,72 +267,72 @@ export const adminPutEditSpe = async (req, res) => {
   if (!updateSpe)
     return res.status(404).send({ message: "No se encontro la especialidad" });
 
-  updateSpe.specialityName = specialityName;
+  if (specialityName !== "") {
+    updateSpe.specialityName = specialityName;
+  }
 
   await updateSpe.save();
 
   res.status(200).send({ message: "Especialidad actualizada correctamente" });
 };
 
-export const adminGetAllBreeds = async (req,res) =>{
-  const allBreeds = await Breed.findAll()
+export const adminGetAllBreeds = async (req, res) => {
+  const allBreeds = await Breed.findAll({
+    include: [
+      {
+        model: TypePet,
+        as: "TypePet",
+      },
+    ],
+  });
 
   if (!allBreeds)
-    return res
-      .status(404)
-      .send({ message: "No se pudieron encontrar razas" });
+    return res.status(404).send({ message: "No se pudieron encontrar razas" });
 
   res.status(200).send({ message: "Razas encontradas", allBreeds });
-}
+};
 
-export const adminDeleteBreed = async (req, res) =>{
-  try
-  {
-    const { idBreed} = req.params
+export const adminDeleteBreed = async (req, res) => {
+  try {
+    const { idBreed } = req.params;
 
-    if(!idBreed){
-      return res
-        .status(400)
-        .json({message: 'ID de la raza es requerido'})
+    if (!idBreed) {
+      return res.status(400).json({ message: "ID de la raza es requerido" });
     }
 
-    const findedBreed = await Breed.findByPk(idBreed)
+    const findedBreed = await Breed.findByPk(idBreed);
 
-    if(!findedBreed){
-      return res
-        .status(404)
-        .json({message: 'Raza no encontrada'})
+    if (!findedBreed) {
+      return res.status(404).json({ message: "Raza no encontrada" });
     }
 
     const petCount = await Pet.count({
-      where:{
-        breed: idBreed
-      }
-    })
+      where: {
+        breed: idBreed,
+      },
+    });
 
-    if (petCount > 0){
-      return res
-        .status(400)
-        .json({message: `No se puede eliminar la raza ya que hay ${petCount} mascotas asociadas`})
+    if (petCount > 0) {
+      return res.status(400).json({
+        message: `No se puede eliminar la raza ya que hay ${petCount} mascota(s) asociada(s)`,
+      });
     }
 
-    await findedBreed.destroy()
+    await findedBreed.destroy();
 
-    const allBreeds = await Breed.findAll()
+    const allBreeds = await Breed.findAll();
 
-    return res
-      .status(200)
-      .json({
-        message: 'Raza eliminada con exito',
-        allBreeds
-      })
-  }catch(err){
-    console.error('Error al eliminar raza seleccionada.')
+    return res.status(200).json({
+      message: "Raza eliminada con exito",
+      allBreeds,
+    });
+  } catch (err) {
+    console.error("Error al eliminar raza seleccionada.");
   }
-}
+};
 
-export const adminGetAllTypes = async(req,res) =>{
-  const allTypes = await TypePet.findAll()
+export const adminGetAllTypes = async (req, res) => {
+  const allTypes = await TypePet.findAll();
 
   if (!allTypes)
     return res
@@ -339,50 +340,147 @@ export const adminGetAllTypes = async(req,res) =>{
       .send({ message: "No se pudieron encontrar tipo de mascotas" });
 
   res.status(200).send({ message: "Tipos de mascotas encontradas", allTypes });
-}
+};
 
-export const adminDeleteTypePet = async (req, res) =>{
-  try
-  {
-    const { idType} = req.params
+export const adminDeleteTypePet = async (req, res) => {
+  try {
+    const { idType } = req.params;
 
-    if(!idType){
+    if (!idType) {
       return res
         .status(400)
-        .json({message: 'ID del tipo de mascota es requerido'})
+        .json({ message: "ID del tipo de mascota es requerido" });
     }
 
-    const findedType = await TypePet.findByPk(idType)
+    const findedType = await TypePet.findByPk(idType);
 
-    if(!findedType){
+    if (!findedType) {
       return res
         .status(404)
-        .json({message: 'No se encontro el tipo de mascota'})
+        .json({ message: "No se encontro el tipo de mascota" });
     }
 
     const petCount = await Pet.count({
-      where:{
-        typePet: idType
-      }
-    })
+      where: {
+        typePet: idType,
+      },
+    });
 
-    if (petCount > 0){
-      return res
-        .status(400)
-        .json({message: `No se puede eliminar el tipo de mascota ya que hay ${petCount} mascotas asociadas`})
+    if (petCount > 0) {
+      return res.status(400).json({
+        message: `No se puede eliminar el tipo de mascota ya que hay ${petCount} mascota(s) asociada(s)`,
+      });
     }
 
-    await findedType.destroy()
+    await findedType.destroy();
 
-    const allTypes = await TypePet.findAll()
+    const allTypes = await TypePet.findAll();
 
-    return res
-      .status(200)
-      .json({
-        message: 'Tipo de mascotas con exito',
-        allTypes
-      })
-  }catch(err){
-    console.error('Error al eliminar el tipo de mascota.')
+    return res.status(200).json({
+      message: "Tipo de mascotas con exito",
+      allTypes,
+    });
+  } catch (err) {
+    return res.status(500).json({
+      message: "Error al eliminar el tipo de mascota.",
+    });
   }
-}
+};
+
+export const editTypeGet = async (req, res) => {
+  const { idType } = req.params;
+
+  if (!idType)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para buscar la especie" });
+
+  const typePet = await TypePet.findByPk(idType);
+
+  if (!typePet)
+    return res.status(404).send({ message: "no se encontro la especialidad" });
+
+  res.status(200).send({ message: "se encontro al especialidad", typePet });
+};
+
+export const editTypePut = async (req, res) => {
+  const { id } = req.params;
+  if (!id)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para actualizar una especie" });
+
+  const { typePet } = req.body;
+
+  if (!typePet)
+    return res.status(500).send({ message: "No se recibio ninguna especie" });
+
+  const { idType, typePetName } = typePet;
+
+  if (Number(id) !== idType)
+    return res.status(500).send({ message: "Error en los datos enviados" });
+
+  const updateType = await TypePet.findByPk(id);
+
+  if (!updateType)
+    return res.status(404).send({ message: "No se encontro la especie" });
+
+  if (typePetName !== "") {
+    updateType.typePetName = typePetName;
+  }
+
+  await updateType.save();
+
+  res.status(200).send({ message: "Especie actualizada correctamente" });
+};
+
+export const editBreedGet = async (req, res) => {
+  const { idBreed } = req.params;
+
+  if (!idBreed)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para buscar la raza" });
+
+  const breed = await Breed.findByPk(idBreed);
+
+  if (!breed)
+    return res.status(404).send({ message: "no se encontro la raza" });
+
+  const typePet = await TypePet.findAll();
+  if (!typePet)
+    return res.status(404).send({ message: "no se encontraron las especies" });
+
+  res.status(200).send({ message: "se encontro la raza", breed, typePet });
+};
+
+export const editBreedPut = async (req, res) => {
+  const { id } = req.params;
+  if (!id)
+    return res
+      .status(500)
+      .send({ message: "Se necesita una id para actualizar una raza" });
+
+  const { breed } = req.body;
+
+  if (!breed)
+    return res.status(500).send({ message: "No se recibio ninguna raza" });
+
+  const { idBreed, nameBreed, idTypePet } = breed;
+
+  if (Number(id) !== idBreed)
+    return res.status(500).send({ message: "Error en los datos enviados" });
+
+  const updateBreed = await Breed.findByPk(id);
+
+  if (!updateBreed)
+    return res.status(404).send({ message: "No se encontro la raza" });
+
+  if (nameBreed !== "") {
+    updateBreed.nameBreed = nameBreed;
+  }
+
+  await updateBreed.save();
+
+  res.status(200).send({ message: "Raza actualizada correctamente" });
+};

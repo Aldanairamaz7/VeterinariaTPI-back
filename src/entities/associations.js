@@ -1,4 +1,3 @@
-// associations.js
 import { User } from "./User.js";
 import { Veterinarian } from "./Veterinarian.js";
 import { Pet } from "./Pet.js";

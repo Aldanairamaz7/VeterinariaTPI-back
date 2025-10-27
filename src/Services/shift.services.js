@@ -125,20 +125,38 @@ export const checkoutShift = async (req, res) => {
             },
           ],
         },
+        {
+          model: Veterinarian,
+          as: "veterinarian",
+          include: [
+            {
+              model: User,
+              as: "veterinarian",
+            },
+          ],
+        },
       ],
       order: [["dateTime", "DESC"]],
     });
+    const formatedShift = shifts.map((shift) => {
+      const vetFirstName = shift.veterinarian?.veterinarian?.firstName || "";
+      const vetLastName = shift.veterinarian?.veterinarian?.lastName || "";
 
-    const formatedShift = shifts.map((shift) => ({
-      id: shift.id,
-      dateTime: shift.dateTime,
-      typeConsult: shift.typeConsult,
-      description: shift.description,
-      name: shift.pet?.name || "Sin mascota",
-      breed: shift.pet?.breedData?.nameBreed || "Sin raza",
-      typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
-      state: shift.state,
-    }));
+      return {
+        id: shift.id,
+        dateTime: shift.dateTime,
+        typeConsult: shift.typeConsult,
+        description: shift.description,
+        name: shift.pet?.name || "Sin mascota",
+        breed: shift.pet?.breedData?.nameBreed || "Sin raza",
+        typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
+        vetName:
+          vetFirstName || vetLastName
+            ? `${vetFirstName} ${vetLastName}`.trim()
+            : "Sin veterinario",
+        state: shift.state,
+      };
+    });
 
     res.status(200).json(formatedShift);
   } catch (error) {

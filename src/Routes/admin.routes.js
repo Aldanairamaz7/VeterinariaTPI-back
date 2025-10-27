@@ -15,6 +15,10 @@ import {
   adminGetUser,
   adminGetUserPets,
   adminPutEditSpe,
+  editBreedGet,
+  editBreedPut,
+  editTypeGet,
+  editTypePut,
 } from "../Services/admin.services.js";
 
 const adminRoutes = Router();
@@ -43,9 +47,22 @@ adminRoutes.get("/editspeciality/:idSpe", authenticateToken, adminGetEditSpe);
 adminRoutes.put("/editspeciality/:idSpe", authenticateToken, adminPutEditSpe);
 
 adminRoutes.get("/adminpanel/breed", authenticateToken, adminGetAllBreeds);
-adminRoutes.delete("/adminpanel/breed/:idBreed", authenticateToken, adminDeleteBreed)
+adminRoutes.delete(
+  "/adminpanel/breed/:idBreed",
+  authenticateToken,
+  adminDeleteBreed
+);
 
-adminRoutes.get("/adminpanel/typePet", authenticateToken, adminGetAllTypes)
-adminRoutes.delete("/adminpanel/typePet/:idType", authenticateToken, adminDeleteTypePet)
+adminRoutes.get("/adminpanel/typePet", authenticateToken, adminGetAllTypes);
+adminRoutes.delete(
+  "/adminpanel/typePet/:idType",
+  authenticateToken,
+  adminDeleteTypePet
+);
 
+adminRoutes.get("/edittype/:idType", authenticateToken, editTypeGet);
+adminRoutes.put("/edittype/:id", authenticateToken, editTypePut);
+
+adminRoutes.get("/editbreed/:idBreed", authenticateToken, editBreedGet);
+adminRoutes.put("/editbreed/:id", authenticateToken, editBreedPut);
 export default adminRoutes;

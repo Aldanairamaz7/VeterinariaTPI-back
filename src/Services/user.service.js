@@ -52,7 +52,7 @@ export const register = async (req, res) => {
       dni,
       email,
       password: hashedPassword,
-      idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
+      //idRole: 3, //descomentar esta linea para crear un usuario con rol de admin
       isActive: true,
     });
 
@@ -71,7 +71,6 @@ export const login = async (req, res) => {
   const resultEmail = validateEmail(email);
   if (!resultEmail) return res.status(401).send({ message: "Email invalido" });
 
-  // min, max, usa mayuscula, usa numeros
   const resultPassword = validatePassword(password, 7, 20, true, true);
 
   if (!resultPassword)
@@ -181,18 +180,15 @@ export const addPet = async (req, res) => {
         {
           model: Breed,
           as: "breedData",
-          /* attributes: ["idBreed", "nameBreed"], */
         },
         {
           model: TypePet,
           as: "typePetData",
-          /* attributes: ["idTypePet", "typePetName"], */
         },
       ],
     });
     res.status(200).json({ message: "Mascota creada con exito", newPet });
   } catch (error) {
-   
     res.status(500).json({ message: "Error del servidor" });
   }
 };
