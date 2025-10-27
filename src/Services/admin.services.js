@@ -4,6 +4,8 @@ import { Roles } from "../entities/Roles.js";
 import { Speciality } from "../entities/Speciality.js";
 import { Shift } from "../entities/Shift.js";
 import { Veterinarian } from "../entities/Veterinarian.js";
+import { Breed } from "../entities/Breed.js";
+import { TypePet } from "../entities/TypePets.js";
 
 export const adminGetUser = async (req, res) => {
   const allUsers = await User.findAll({
@@ -160,7 +162,10 @@ export const adminGetAllPets = async (req, res) => {
       {
         model: User,
         as: "user",
-      },
+      },{
+        model: Breed,
+        as: 'breedData'
+      }
     ],
   });
 
@@ -267,3 +272,117 @@ export const adminPutEditSpe = async (req, res) => {
 
   res.status(200).send({ message: "Especialidad actualizada correctamente" });
 };
+
+export const adminGetAllBreeds = async (req,res) =>{
+  const allBreeds = await Breed.findAll()
+
+  if (!allBreeds)
+    return res
+      .status(404)
+      .send({ message: "No se pudieron encontrar razas" });
+
+  res.status(200).send({ message: "Razas encontradas", allBreeds });
+}
+
+export const adminDeleteBreed = async (req, res) =>{
+  try
+  {
+    const { idBreed} = req.params
+
+    if(!idBreed){
+      return res
+        .status(400)
+        .json({message: 'ID de la raza es requerido'})
+    }
+
+    const findedBreed = await Breed.findByPk(idBreed)
+
+    if(!findedBreed){
+      return res
+        .status(404)
+        .json({message: 'Raza no encontrada'})
+    }
+
+    const petCount = await Pet.count({
+      where:{
+        breed: idBreed
+      }
+    })
+
+    if (petCount > 0){
+      return res
+        .status(400)
+        .json({message: `No se puede eliminar la raza ya que hay ${petCount} mascotas asociadas`})
+    }
+
+    await findedBreed.destroy()
+
+    const allBreeds = await Breed.findAll()
+
+    return res
+      .status(200)
+      .json({
+        message: 'Raza eliminada con exito',
+        allBreeds
+      })
+  }catch(err){
+    console.error('Error al eliminar raza seleccionada.')
+  }
+}
+
+export const adminGetAllTypes = async(req,res) =>{
+  const allTypes = await TypePet.findAll()
+
+  if (!allTypes)
+    return res
+      .status(404)
+      .send({ message: "No se pudieron encontrar tipo de mascotas" });
+
+  res.status(200).send({ message: "Tipos de mascotas encontradas", allTypes });
+}
+
+export const adminDeleteTypePet = async (req, res) =>{
+  try
+  {
+    const { idType} = req.params
+
+    if(!idType){
+      return res
+        .status(400)
+        .json({message: 'ID del tipo de mascota es requerido'})
+    }
+
+    const findedType = await TypePet.findByPk(idType)
+
+    if(!findedType){
+      return res
+        .status(404)
+        .json({message: 'No se encontro el tipo de mascota'})
+    }
+
+    const petCount = await Pet.count({
+      where:{
+        typePet: idType
+      }
+    })
+
+    if (petCount > 0){
+      return res
+        .status(400)
+        .json({message: `No se puede eliminar el tipo de mascota ya que hay ${petCount} mascotas asociadas`})
+    }
+
+    await findedType.destroy()
+
+    const allTypes = await TypePet.findAll()
+
+    return res
+      .status(200)
+      .json({
+        message: 'Tipo de mascotas con exito',
+        allTypes
+      })
+  }catch(err){
+    console.error('Error al eliminar el tipo de mascota.')
+  }
+}
