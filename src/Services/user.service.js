@@ -130,7 +130,6 @@ export const authenticateToken = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("Error al verificar el token", error);
     return res.status(403).json({ message: "Token invalido" });
   }
 };
@@ -193,7 +192,7 @@ export const addPet = async (req, res) => {
     });
     res.status(200).json({ message: "Mascota creada con exito", newPet });
   } catch (error) {
-    console.error("Error al agregar mascota", error);
+   
     res.status(500).json({ message: "Error del servidor" });
   }
 };
@@ -215,7 +214,7 @@ export const editProfile = async (req, res) => {
     } = userData;
 
     const targetUserId = req.params.id || req.user.id;
-    // Fijarse si es que anda lo relacionado al veterinario.
+
     const user = await User.findByPk(targetUserId, {
       attributes: [
         "id",
@@ -347,7 +346,6 @@ export const editProfile = async (req, res) => {
       user: updatedUser,
     });
   } catch (error) {
-    console.error("Error en editProfile: ", error);
     res.status(500).json({ message: "Error del servidor" });
   }
 };

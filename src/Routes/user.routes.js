@@ -78,16 +78,12 @@ userRoutes.get("/user/me", authenticateToken, async (req, res) => {
 
     res.json({ user });
   } catch (error) {
-    console.error("Error en /user/me", error);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 });
 
 userRoutes.post("/addpet", authenticateToken, addPet);
 userRoutes.get("/editprofile/:userId", authenticateToken, editGetUser);
-
-/* Hay que testear estos endpoints */
-
 userRoutes.put("/editprofile/:id", authenticateToken, editProfile);
 
 export default userRoutes;

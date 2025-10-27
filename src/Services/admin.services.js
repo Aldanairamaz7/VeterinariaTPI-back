@@ -3,7 +3,6 @@ import { Pet } from "../entities/Pet.js";
 import { Roles } from "../entities/Roles.js";
 import { Speciality } from "../entities/Speciality.js";
 import { Shift } from "../entities/Shift.js";
-import { where } from "sequelize";
 import { Veterinarian } from "../entities/Veterinarian.js";
 
 export const adminGetUser = async (req, res) => {
@@ -220,7 +219,6 @@ export const adminDeleteSpeciality = async (req, res) => {
       specialities,
     });
   } catch (error) {
-    console.error("Error al eliminar especialidad:", error);
     return res.status(500).json({ message: "Error interno del servidor." });
   }
 };

@@ -4,7 +4,7 @@ export const initializationRoles = async () => {
   const basicRoles = [
     {
       idRole: 1,
-      roleSumary: "Usuario", //cambiar a rolName
+      roleSumary: "Usuario", 
     },
     {
       idRole: 2,
