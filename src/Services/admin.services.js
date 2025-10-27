@@ -144,6 +144,10 @@ export const adminGetUserPets = async (req, res) => {
 
   const pets = await Pet.findAll({
     where: { userId: id },
+    include:{
+      model: Breed,
+      as: "breedData"
+    }
   });
 
   if (!pets)
