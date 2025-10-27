@@ -57,6 +57,7 @@ export const createShift = async (req, res) => {
         dateTime: {
           [Op.between]: [startOfDay, endOfDay],
         },
+        state: "Pendiente",
       },
     });
     if (count >= 5) {
@@ -147,60 +148,93 @@ export const checkoutShift = async (req, res) => {
 
 export const cancelShift = async (req, res) => {
   const { userId, id } = req.params;
-  const userIdFromToken = req.user.id;
+  const roleUser = req.user.idRole;
   console.log(id, userId);
-  
+
   try {
     const shift = await Shift.findByPk(id);
     if (!shift) {
       return res.status(404).json({ message: "Turno no encontrado" });
     }
 
-    /* if (
-      shift.userId !== userIdFromToken ||
-      shift.enrollment !== userIdFromToken
-    ) {
-      return res
-        .status(403)
-        .json({ message: "No tiene permiso para cancelar el turno" });
-    } */
-
     shift.state = "Cancelado";
     await shift.save();
+    let allShift;
+    if (roleUser === 2) {
+      allShift = await Shift.findAll({
+        where: { enrollment: userId },
+        include: [
+          {
+            model: Pet,
+            as: "pet",
+            attributes: ["id", "name", "breed", "typePet"],
+            include: [
+              {
+                model: Breed,
+                as: "breedData",
+                required: false,
+              },
+              {
+                model: TypePet,
+                as: "typePetData",
 
-    const allShift = await Shift.findAll({
-      where: { userId },
-      include: [
-        {
-          model: Pet,
-          as: "pet",
-          attributes: ["id", "name", "breed", "typePet"],
-          include: [
-            {
-              model: Breed,
-              as: "breedData",
-              attributes: ["nameBreed"],
-              required: false,
-            },
-            {
-              model: TypePet,
-              as: "typePetData",
-              attributes: ["typePetName"],
-              required: false,
-            },
-          ],
-        },
-      ],
-      order: [["dateTime", "DESC"]],
-    });
+                required: false,
+              },
+            ],
+          },
+          {
+            model: User,
+            as: "client",
+            attributes: ["id", "firstName", "lastName", "email"],
+          },
+        ],
+        order: [["dateTime", "DESC"]],
+      });
+    } else {
+      allShift = await Shift.findAll({
+        where: { userId },
+        include: [
+          {
+            model: Pet,
+            as: "pet",
+            attributes: ["id", "name", "breed", "typePet"],
+            include: [
+              {
+                model: Breed,
+                as: "breedData",
+                required: false,
+              },
+              {
+                model: TypePet,
+                as: "typePetData",
+                required: false,
+              },
+            ],
+          },
+        ],
+        order: [["dateTime", "DESC"]],
+      });
+    }
+
     const formatedShift = allShift.map((shift) => ({
       id: shift.id,
       dateTime: shift.dateTime,
       typeConsult: shift.typeConsult,
       description: shift.description,
-      name: shift.pet?.name || "Sin mascota",
-      breed: shift.pet?.breedData?.nameBreed || "Sin raza",
-      typePet: shift.pet?.typePetData?.typePetName || "Sin tipo",
+      pet: {
+        id: shift.pet?.id || null,
+        name: shift.pet?.name || "Sin mascota",
+        breedData: {
+          nameBreed: shift.pet?.breedData?.nameBreed || "Sin raza",
+        },
+        typePetData: {
+          typePetName: shift.pet?.typePetData?.typePetName || "Sin tipo",
+        },
+      },
+      client: {
+        firstName: shift.client.firstName,
+        lastName: shift.client.lastName,
+      },
       state: shift.state,
     }));
 
@@ -221,7 +255,13 @@ export const getSpeciality = async (req, res) => {
         .json({ message: "no se pudo encontarar especialidades" });
     const veterinarians = await User.findAll({
       where: { idRole: 2 },
-      include: [{ model: Veterinarian, as: "veterinarian" }],
+      include: [
+        {
+          model: Veterinarian,
+          as: "veterinarian",
+          include: [{ model: Speciality, as: "speciality" }],
+        },
+      ],
     });
     if (!veterinarians)
       return res

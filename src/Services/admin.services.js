@@ -29,6 +29,7 @@ export const adminGetUser = async (req, res) => {
 
 export const adminDeleteUser = async (req, res) => {
   const { idUserDelete } = req.body;
+  let hasVetShift = false;
   if (!idUserDelete)
     return res
       .status(404)
@@ -37,34 +38,69 @@ export const adminDeleteUser = async (req, res) => {
   if (!user)
     return res.status(404).json({ message: "No se encontro al usuario" });
 
+  //let userVet;
+  if (user.idRole === 2) {
+    const userVet = await Veterinarian.findOne({
+      where: {
+        userId: user.id,
+        isActive: true,
+      },
+    });
+    if (!userVet)
+      return res.status(404).send({ message: "No se encontro el veterinario" });
+
+    const vetShift = await Shift.findAndCountAll({
+      where: {
+        enrollment: userVet.enrollment,
+      },
+    });
+
+    if (vetShift.count <= 0) {
+      await userVet.destroy();
+    } else {
+      userVet.isActive = false;
+      await Promise.all(
+        vetShift.rows.map(async (el) => {
+          if (el.state === "Pendiente") {
+            el.state = "Cancelado";
+            await el.save();
+          }
+        })
+      );
+      hasVetShift = true;
+      await userVet.save();
+    }
+  }
+
   const allShift = await Shift.count({
     where: {
       userId: user.id,
     },
   });
+
   const pets = await Pet.findAll({
     where: {
       userId: user.id,
     },
   });
-  if (allShift <= 0) {
+  if (allShift <= 0 && !hasVetShift) {
     await user.destroy();
     await Promise.all(pets.map((el) => el.destroy()));
   } else {
     user.isActive = false;
     await Promise.all(
       pets.map(async (el) => {
-        const allShift = await Shift.findAndCountAll({
+        const allShiftPet = await Shift.findAndCountAll({
           where: {
             petId: el.id,
             state: "Pendiente", //revisar que solo los shift con state en pendiete se cancelen cuando se elimina el usuaurio
           },
         });
-        if (allShift.count <= 0) {
+        if (allShiftPet.count <= 0) {
           await el.destroy();
         } else {
           el.isActive = false;
-          allShift.rows.map(async (shift) => {
+          allShiftPet.rows.map(async (shift) => {
             shift.state = "Cancelado";
             await shift.save();
           });

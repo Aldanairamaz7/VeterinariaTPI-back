@@ -16,16 +16,18 @@ export const defineAssociations = () => {
   Veterinarian.belongsTo(User, { foreignKey: "userId", as: "veterinarian" });
 
   Pet.hasMany(Shift, { foreignKey: "petId", onDelete: "CASCADE" });
-  Shift.belongsTo(Pet, { foreignKey: "petId", as: 'pet' });
+  Shift.belongsTo(Pet, { foreignKey: "petId", as: "pet" });
 
   User.hasMany(Shift, { foreignKey: "userId", onDelete: "CASCADE" });
-  Shift.belongsTo(User, { foreignKey: "userId" , as: 'client'});
+  Shift.belongsTo(User, { foreignKey: "userId", as: "client" });
 
   Veterinarian.hasMany(Shift, {
     foreignKey: "enrollment",
-    onDelete: "CASCADE",
   });
-  Shift.belongsTo(Veterinarian, { foreignKey: "enrollment", as: 'veterinarian'});
+  Shift.belongsTo(Veterinarian, {
+    foreignKey: "enrollment",
+    as: "veterinarian",
+  });
 
   Roles.hasMany(User, { foreignKey: "idRole", onDelete: "CASCADE" });
   User.belongsTo(Roles, { foreignKey: "idRole", as: "roles" });
@@ -41,9 +43,9 @@ export const defineAssociations = () => {
   TypePet.hasMany(Breed, { foreignKey: "idTypePet" });
   Breed.belongsTo(TypePet, { foreignKey: "idTypePet" });
 
-  TypePet.hasMany(Pet, { foreignKey: "typePet", as: 'pets' });
-  Pet.belongsTo(TypePet, { foreignKey: "typePet", as: 'typePetData' });
+  TypePet.hasMany(Pet, { foreignKey: "typePet", as: "pets" });
+  Pet.belongsTo(TypePet, { foreignKey: "typePet", as: "typePetData" });
 
-  Breed.hasMany(Pet, { foreignKey: "breed" ,as: 'pets'});
-  Pet.belongsTo(Breed, { foreignKey: "breed", as: 'breedData' });
+  Breed.hasMany(Pet, { foreignKey: "breed", as: "pets" });
+  Pet.belongsTo(Breed, { foreignKey: "breed", as: "breedData" });
 };

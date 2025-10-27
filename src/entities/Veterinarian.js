@@ -13,7 +13,7 @@ export const Veterinarian = sequelize.define(
       allowNull: false,
       references: {
         model: "speciality",
-        key: "idSpeciality"
+        key: "idSpeciality",
       },
     },
     userId: {
@@ -24,6 +24,11 @@ export const Veterinarian = sequelize.define(
         model: "users",
         key: "id",
       },
+    },
+    isActive: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: true,
     },
   },
   { timestamps: false, tableName: "veterinarians" }
